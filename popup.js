@@ -246,6 +246,7 @@ class Popup {
     document.getElementById('versionInfo').textContent = t('version') + ': ';
     document.getElementById('developerInfo').textContent = t('developedBy') + ': ';
     document.getElementById('websiteInfo').textContent = t('website') + ': ';
+    document.getElementById('sources').textContent = t('sources') + ': ';
     document.getElementById('backFromAbout').textContent = t('back');
   
     // Mise à jour du sélecteur de langue
