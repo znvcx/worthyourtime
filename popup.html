@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Worth Your Time? (WYT)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="message"></div>
+  <div id="main-content" class="container">
+    <h2 id="title"></h2>
+    <p id="description" class="description"></p>
+    <div class="input-group">
+      <label for="tauxHoraire" id="hourlyRateLabel"></label>
+      <input type="number" id="tauxHoraire" min="0.01" step="0.01" required>
+    </div>
+    <div class="input-group">
+      <label for="heuresParJour" id="hoursPerDayLabel"></label>
+      <input type="number" id="heuresParJour" min="0.1" max="24" step="0.1" required>
+    </div>
+    <div class="switch-label">
+      <span id="conversionActiveLabel"></span>
+      <label class="switch">
+        <input type="checkbox" id="conversionActive">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <button id="sauvegarder"></button>
+    <div class="custom-calculation">
+      <h3 id="customCalculationTitle"></h3>
+      <div class="input-group">
+        <div class="input-result-wrapper">
+          <input type="number" id="prixPersonnalise" min="0.01" step="0.01" required>
+          <span id="resultatCalcul"></span>
+        </div>
+      </div>
+      <button id="calculerTemps"></button>
+    </div>
+    <div class="settings-link">
+      <p><a href="#" id="openSettings"></a></p>
+    </div>
+  </div>
+
+  <div id="settings-content" class="container" style="display: none;">
+    <h2 id="settingsTitle"></h2>
+    <div class="settings-row language-row">
+      <label for="language-select" id="languageLabel"></label>
+      <select id="language-select"></select>
+    </div>
+    <div class="theme-switch">
+      <div class="switch-label">
+        <span id="followSystemThemeLabel"></span>
+        <label class="switch">
+          <input type="checkbox" id="systemTheme">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="switch-label">
+        <span id="darkModeLabel"></span>
+        <label class="switch">
+          <input type="checkbox" id="darkModeToggle">
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+    <div class="settings-link">
+      <a href="#" id="backToMain"></a>
+    </div>
+    <div class="settings-link">
+      <a href="#" id="openAbout"></a>
+    </div>
+  </div>
+
+  <div id="about-content" class="container" style="display: none;">
+    <h2 id="aboutTitle"></h2>
+    <p id="aboutDescription"></p>
+    <p><span id="versionInfo"></span>0.1.8.5</p>
+    <p><span id="developerInfo"></span><a href="https://aek.one/contact" target="_blank">AK1</a></p>
+    <p><span id="websiteInfo"></span><a href="https://delta-gate.one" target="_blank">https://delta-gate.one</a></p>
+    <div class="settings-link">
+      <a href="#" id="backFromAbout"></a>
+    </div>
+  </div>
+  
+  <script src="locales.js"></script>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
