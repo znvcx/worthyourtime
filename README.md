@@ -26,6 +26,7 @@ Vous pouvez personnaliser les paramètres suivants :
 - Langue (anglais ou français)
 - Thème (clair, sombre, ou suivre le thème du système)
 ## Structure du projet
+<pre>
 worth-your-time/
 │
 ├── manifest.json           # Fichier de configuration de l'extension
@@ -36,6 +37,7 @@ worth-your-time/
 ├── locales.js              # Fichier de traductions
 ├── styles.css              # Styles CSS
 └── icons/                  # Dossier contenant les icônes de l'extension
+</pre>
 ## Développement
 ### Fichiers principaux
 - manifest.json: Définit les métadonnées de l'extension, les permissions et les scripts.
