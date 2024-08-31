@@ -8,16 +8,20 @@
 - Mode sombre et suivi du thème système
 - Interface utilisateur intuitive et responsive
 ## Installation
+**Recommandée:**
+- Installez directement depuis Mozilla Addons: https://addons.mozilla.org/en-US/firefox/addon/worth-your-time/
+
+ **Manuelle:**
 - Téléchargez le code source de l'extension
 - Ouvrez Firefox et accédez à about:debugging#/runtime/this-firefox
 - Cliquez sur "Charger un module complémentaire temporaire"
 - Sélectionnez le fichier manifest.json dans le dossier de l'extension
 ## Utilisation
 - Cliquez sur l'icône de l'extension dans la barre d'outils du navigateur pour ouvrir le popup
-- Configurez votre taux horaire et vos heures de travail par jour
-- Activez ou désactivez la conversion automatique
-- Utilisez le calculateur personnalisé pour des conversions spécifiques
-- Naviguez sur le web et voyez les prix convertis en temps de travail
+- Configurez votre taux horaire et vos heures de travail par jour, par exemple 20.- de l'heure et 9h par jour
+- La conversion devrait se faire automatiquement sur la page
+- Pour revenir à l'affichage initial, désactivez la conversion automatique avec le switch y relatif
+- Pour calculer un prix spécifique qui n'apparait pas sur la page ou dont la conversion ne se fait pas automatiquement, utilisez le calculateur personnalisé et indiquez le prix à convertir
 ## Configuration
 Vous pouvez personnaliser les paramètres suivants :
 - Taux horaire
@@ -40,16 +44,16 @@ worth-your-time/
 </pre>
 ## Développement
 ### Fichiers principaux
-- manifest.json: Définit les métadonnées de l'extension, les permissions et les scripts.
-- popup.html: Structure HTML du popup de l'extension.
-- popup.js: Gère la logique du popup, y compris les interactions utilisateur et la mise à jour de l'interface.
-- content.js: Responsable de la conversion des prix sur les pages web visitées.
-- background.js: Gère les tâches en arrière-plan et la communication entre les différents scripts.
-- locales.js: Contient les traductions pour l'internationalisation de l'extension.
+- **manifest.json:** Définit les métadonnées de l'extension, les permissions et les scripts.
+- **popup.html:** Structure HTML du popup de l'extension.
+- **popup.js:** Gère la logique du popup, y compris les interactions utilisateur et la mise à jour de l'interface.
+- **content.js:** Responsable de la conversion des prix sur les pages web visitées.
+- **background.js:** Gère les tâches en arrière-plan et la communication entre les différents scripts.
+- **locales.js:** Contient les traductions pour l'internationalisation de l'extension.
 ### Fonctions clés
-- Popup class dans popup.js: Gère l'interface utilisateur du popup et les interactions.
-- remplacerPrix() dans content.js: Convertit les prix sur les pages web.
-- formatTemps(): Formate le temps de travail calculé en jours, heures et minutes.
+- **Popup class dans popup.js:** Gère l'interface utilisateur du popup et les interactions.
+- **remplacerPrix() dans content.js:** Convertit les prix sur les pages web.
+- **formatTemps():** Formate le temps de travail calculé en jours, heures et minutes.
 ## Contribution
 Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou à soumettre une pull request pour des améliorations ou des corrections de bugs.
 ## Licence
