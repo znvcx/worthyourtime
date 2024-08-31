@@ -44,7 +44,7 @@
         const prixNumerique = parseFloat(prix.replace(/[' \u00A0]/g, '').replace(',', '.'));
         const tempsEnHeures = prixNumerique / tauxHoraire;
         const tempsFormate = formatTemps(tempsEnHeures);
-        return `${tempsFormate} <small style="font-size: 0.8em; color: #666;">(${match})</small>`;
+        return `${tempsFormate} (${match})`;
     }
 
     function remplacerPrixDansElement(element) {
@@ -53,7 +53,9 @@
                 const texteOriginal = element.textContent;
                 const nouveauTexte = texteOriginal.replace(regex, convertirPrix);
                 if (texteOriginal !== nouveauTexte) {
-                    element.innerHTML = nouveauTexte;
+                    const newElement = document.createElement('span');
+                    newElement.textContent = nouveauTexte;
+                    element.parentNode.replaceChild(newElement, element);
                 }
             }
         } else {
@@ -63,7 +65,7 @@
                         const nouveauTexte = child.textContent.replace(regex, convertirPrix);
                         if (child.textContent !== nouveauTexte) {
                             const span = document.createElement('span');
-                            span.innerHTML = nouveauTexte;
+                            span.textContent = nouveauTexte;
                             child.parentNode.replaceChild(span, child);
                         }
                     }
@@ -95,7 +97,15 @@
           const id = element.getAttribute('data-prix-id');
           const prixOriginal = prixOriginaux.get(id);
           if (prixOriginal) {
-              element.outerHTML = prixOriginal;
+              const tempDiv = document.createElement('div');
+              tempDiv.textContent = prixOriginal;
+              while (element.firstChild) {
+                  element.removeChild(element.firstChild);
+              }
+              while (tempDiv.firstChild) {
+                  element.appendChild(tempDiv.firstChild);
+              }
+              element.removeAttribute('data-prix-id');
           }
       });
       prixOriginaux.clear();

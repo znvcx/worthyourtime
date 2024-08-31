@@ -9,18 +9,14 @@
     }
   },
   "icons": {
-    "16": "icons/wyt1.png",
-    "32": "icons/wyt2.png",
-    "48": "icons/wyt2.png",
-    "128": "icons/wyt3.png"
+    "64": "icons/wyt1.png",
+    "128": "icons/wyt2.png"
   },
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icons/wyt1.png",
-      "32": "icons/wyt2.png",
-      "48": "icons/wyt2.png",
-      "128": "icons/wyt3.png"
+      "64": "icons/wyt1.png",
+      "128": "icons/wyt2.png"
     }
   },
   "permissions": [
@@ -40,6 +36,5 @@
       "matches": ["<all_urls>"],
       "js": ["content.js", "locales.js"]
     }
-  ],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+  ]
 }
