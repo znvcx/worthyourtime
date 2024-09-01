@@ -49,21 +49,18 @@ function remplacerPrix() {
     logDebug("Remplacement des prix");
     
     const regexAgressif = /(?<!\d)(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)\s*)?(\d{1,3}(?:[.,\s']\d{3})*(?:[.,]\d{2})?)\s*(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)|\.–|\.-)?(?!\d)/g;
-    const regexDoux = /(?<!\d)(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)\s*)?(\d{1,3}(?:[ '\u00A0]\d{3})*(?:[.,]\d{1,2})?)\s*(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)|\.–|\.-)?(?!\d)/g;
-
+    const regexDoux = /(?<!\d)(?:([₿₽₺₩₴₦₱₭₫៛₪₨$€£¥]|[A-Z]{3})\s*(\d{1,3}(?:[ '\u00A0]\d{3})*(?:[.,]\d{2})?)|(\d{1,3}(?:[ '\u00A0]\d{3})*(?:[.,]\d{2})?)\s*([₿₽₺₩₴₦₱₭₫៛₪₨$€£¥]|[A-Z]{3})|(\d{1,3}(?:[ '\u00A0]\d{3})*(?:[.,]\d{2})?(?:\.–|\.-)))(?!\d)/g;
+    
     const regex = aggressiveMode ? regexAgressif : regexDoux;
     logDebug(`Mode utilisé pour la regex : ${aggressiveMode ? 'agressif' : 'doux'}`);
 
-    function convertirPrix(match, deviseBefore, prix, deviseAfter) {
+    function convertirPrix(match, deviseAvant, prixAvecDeviseAvant, prixSansDevise, deviseApres) {
+        const prix = prixAvecDeviseAvant || prixSansDevise;
         if (!prix) {
             logDebug("Prix non trouvé dans le match:", match);
             return match;
         }
-        const devise = deviseBefore || deviseAfter;
-        if (!devise && !match.includes('.–') && !match.includes('.-') && !/\d{1,3}(?:[.,\s']\d{3})*(?:[.,]\d{2})?/.test(prix)) {
-            return match;
-        }
-        const prixNumerique = parseFloat(prix.replace(/(\d)[.,\s'](\d{3})/g, '$1$2').replace(',', '.'));
+        const prixNumerique = parseFloat(prix.replace(/[^\d.,]/g, '').replace(',', '.'));
         const tempsEnHeures = prixNumerique / tauxHoraire;
         const tempsFormate = formatTemps(tempsEnHeures, heuresParJour);
         return `${tempsFormate} (${match})`;
