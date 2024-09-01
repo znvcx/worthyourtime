@@ -22,11 +22,10 @@ body {
     color: var(--text-color);
     margin: 0;
     padding: 20px;
-    width: 400px;     
+    width: 400px;    
     box-sizing: border-box;
     transition: background-color 0.3s, color 0.3s;
-    padding-top: 40px;
-    overflow-y: auto;
+    overflow: auto;
 }
 
 h1, h2, h3, h4, h5, h6 {

@@ -102,5 +102,24 @@
   <script type="module" src="locales.js"></script>
   <script type="module" src="content.js"></script>
   <script type="module" src="popup.js"></script>
+  <script>
+    function resizePopup() {
+      const body = document.body;
+      const html = document.documentElement;
+      const height = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+      browser.runtime.sendMessage({ action: "resize", height: height + 20 }); // Ajout d'une marge
+    }
+
+    // Exécutez resizePopup après le chargement initial et après un court délai
+    window.addEventListener('load', () => {
+      setTimeout(resizePopup, 100); // Délai de 100ms pour laisser le temps au contenu de se rendre
+    });
+
+    // Exécutez resizePopup après chaque mutation du DOM
+    const observer = new MutationObserver(() => {
+      setTimeout(resizePopup, 50); // Délai de 50ms après chaque mutation
+    });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+  </script>
 </body>
 </html>

@@ -28,7 +28,8 @@
     "styles.css"
   ],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["loader.js"],
+    "type": "module",
     "persistent": false
   },
   "content_scripts": [

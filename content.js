@@ -2,6 +2,9 @@ import { logDebug, setDebugMode, formatTemps, validateNumber } from './utils.js'
 
 logDebug("Script de contenu chargé");
 
+// Informer le background script que le content script est prêt
+browser.runtime.sendMessage({ action: "contentScriptReady" });
+
 let prixOriginaux = new Map();
 let conversionActive = true;
 let tauxHoraire, heuresParJour;
@@ -45,11 +48,8 @@ function mettreAJourPrixConvertis() {
 function remplacerPrix() {
     logDebug("Remplacement des prix");
     
-    // Expression régulière pour le mode agressif (existante)
     const regexAgressif = /(?<!\d)(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)\s*)?(\d{1,3}(?:[.,\s']\d{3})*(?:[.,]\d{2})?)\s*(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)|\.–|\.-)?(?!\d)/g;
-    
-    // Expression régulière pour le mode doux (nouvelle)
-    const regexDoux = /(?<!\d)(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)\s*)?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)\s*(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)|\.–|\.-)?(?!\d)/g;
+    const regexDoux = /(?<!\d)(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)\s*)?(\d{1,3}(?:[ '\u00A0]\d{3})*(?:[.,]\d{1,2})?)\s*(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)|\.–|\.-)?(?!\d)/g;
 
     const regex = aggressiveMode ? regexAgressif : regexDoux;
     logDebug(`Mode utilisé pour la regex : ${aggressiveMode ? 'agressif' : 'doux'}`);
@@ -63,7 +63,6 @@ function remplacerPrix() {
         if (!devise && !match.includes('.–') && !match.includes('.-') && !/\d{1,3}(?:[.,\s']\d{3})*(?:[.,]\d{2})?/.test(prix)) {
             return match;
         }
-        // Remplacer les séparateurs de milliers par rien et les séparateurs décimaux par un point
         const prixNumerique = parseFloat(prix.replace(/(\d)[.,\s'](\d{3})/g, '$1$2').replace(',', '.'));
         const tempsEnHeures = prixNumerique / tauxHoraire;
         const tempsFormate = formatTemps(tempsEnHeures, heuresParJour);
@@ -71,31 +70,16 @@ function remplacerPrix() {
     }
 
     function remplacerPrixDansElement(element) {
-        if (element.childNodes.length === 0) {
-            if (element.textContent && regex.test(element.textContent)) {
-                const texteOriginal = element.textContent;
-                const nouveauTexte = texteOriginal.replace(regex, convertirPrix);
-                if (texteOriginal !== nouveauTexte) {
-                    const newElement = document.createElement('span');
-                    newElement.textContent = nouveauTexte;
-                    element.parentNode.replaceChild(newElement, element);
-                }
+        if (element.nodeType === Node.TEXT_NODE) {
+            const texteOriginal = element.textContent;
+            const nouveauTexte = texteOriginal.replace(regex, convertirPrix);
+            if (texteOriginal !== nouveauTexte) {
+                element.textContent = nouveauTexte;
             }
-        } else {
-            Array.from(element.childNodes).forEach(child => {
-                if (child.nodeType === Node.TEXT_NODE) {
-                    if (regex.test(child.textContent)) {
-                        const nouveauTexte = child.textContent.replace(regex, convertirPrix);
-                        if (child.textContent !== nouveauTexte) {
-                            const span = document.createElement('span');
-                            span.textContent = nouveauTexte;
-                            child.parentNode.replaceChild(span, child);
-                        }
-                    }
-                } else if (child.nodeType === Node.ELEMENT_NODE) {
-                    remplacerPrixDansElement(child);
-                }
-            });
+        } else if (element.nodeType === Node.ELEMENT_NODE) {
+            if (element.tagName !== 'SCRIPT' && element.tagName !== 'STYLE') {
+                Array.from(element.childNodes).forEach(remplacerPrixDansElement);
+            }
         }
     }
 
@@ -142,6 +126,10 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             logDebug(`Mode agressif : ${aggressiveMode ? 'activé' : 'désactivé'}`);
             mettreAJourPrixConvertis();
         });
+    } else if (message.action === "updateAggressiveMode") {
+        aggressiveMode = message.aggressiveMode;
+        logDebug(`Mode agressif mis à jour : ${aggressiveMode ? 'activé' : 'désactivé'}`);
+        mettreAJourPrixConvertis();
     }
 });
 

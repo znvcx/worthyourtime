@@ -36,7 +36,12 @@ window.locales = {
       debugMode: "Mode Debug",
       debugModeChanged: "Mode Debug activé",
       errorSavingDebugMode: "Erreur lors de la sauvegarde du mode Debug",
-      aggressiveMode: "Mode agressif"
+      aggressiveMode: "Mode agressif",
+      aggressiveModeEnabled: "Mode agressif activé",
+      aggressiveModeDisabled: "Mode agressif désactivé",
+      errorSavingAggressiveMode: "Erreur lors de la sauvegarde du mode agressif",
+      errorGettingActiveTabs: "Erreur lors de la récupération des onglets actifs",
+      errorReloadingPage: "Erreur lors du rechargement de la page"  
     },
     en: {
       title: "Worth Your Time?",
@@ -75,6 +80,11 @@ window.locales = {
       debugMode: "Debug Mode",
       debugModeChanged: "Debug Mode enabled",
       errorSavingDebugMode: "Error saving Debug Mode",
-      aggressiveMode: "Aggressive Mode"
+      aggressiveMode: "Aggressive Mode",
+      aggressiveModeEnabled: "Aggressive Mode enabled",
+      aggressiveModeDisabled: "Aggressive Mode disabled",
+      errorSavingAggressiveMode: "Error saving Aggressive Mode",
+      errorGettingActiveTabs: "Error getting active tabs",
+      errorReloadingPage: "Error reloading page"  
     }
   };

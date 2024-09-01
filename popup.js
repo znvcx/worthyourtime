@@ -44,6 +44,7 @@ class Popup {
     this.openAboutButton = document.getElementById('openAbout');
     this.backFromAboutButton = document.getElementById('backFromAbout');
     this.debugModeToggle = document.getElementById('debugModeToggle');
+    this.aggressiveModeToggle = document.getElementById('aggressiveModeToggle');
 
     // Liaison des méthodes
     this.loadOptions = this.loadOptions.bind(this);
@@ -54,6 +55,7 @@ class Popup {
     this.setupEventListeners();
     this.setupSystemThemeListener();
     this.updateUI();
+    
   }
 
   /**
@@ -64,6 +66,11 @@ class Popup {
     this.initLanguage();
     this.updateUI();
     this.setupEventListeners();
+    setTimeout(() => {
+      if (typeof resizePopup === 'function') {
+        resizePopup();
+      }
+    }, 100);
   }
 
   /**
@@ -107,6 +114,7 @@ class Popup {
       this.showSettingsContent();
     });
     this.debugModeToggle.addEventListener('change', () => this.updateDebugMode());
+    this.aggressiveModeToggle.addEventListener('change', () => this.updateAggressiveMode());
   }
 
   /**
@@ -116,6 +124,7 @@ class Popup {
     this.mainContent.style.display = 'block';
     this.settingsContent.style.display = 'none';
     this.aboutContent.style.display = 'none';
+    
   }
 
   /**
@@ -125,6 +134,7 @@ class Popup {
     this.mainContent.style.display = 'none';
     this.settingsContent.style.display = 'block';
     this.aboutContent.style.display = 'none';
+    
   }
 
   /**
@@ -134,6 +144,7 @@ class Popup {
     this.mainContent.style.display = 'none';
     this.settingsContent.style.display = 'none';
     this.aboutContent.style.display = 'block';
+    
   }
 
   /**
@@ -171,6 +182,7 @@ class Popup {
       setDebugMode(this.debugMode);
       this.updateUITheme();
       this.updateUI();
+      
     }).catch(error => {
       logDebug('Error loading options:', error);
       this.afficherMessage(t('errorLoadingOptions'), true);
@@ -193,6 +205,11 @@ class Popup {
 
       .then(() => {
         this.afficherMessage(t('settingsSaved'));
+        
+        if (this.aggressiveMode !== aggressiveMode) {
+          this.afficherMessage(t(aggressiveMode ? 'aggressiveModeEnabled' : 'aggressiveModeDisabled'));
+          this.aggressiveMode = aggressiveMode;
+        }
         browser.tabs.query({active: true, currentWindow: true})
           .then(tabs => {
             if (tabs[0]) {
@@ -272,6 +289,7 @@ class Popup {
   updateUI() {
     this.updateUIText();
     this.updateUITheme();
+    
     
     // Mise à jour des valeurs des champs
     this.tauxHoraireInput.value = this.tauxHoraire;
@@ -436,5 +454,38 @@ class Popup {
         this.afficherMessage(t('debugModeChanged'));
       })
       .catch(error => this.afficherMessage(t('errorSavingDebugMode'), true));
+  }
+
+  updateAggressiveMode() {
+    const aggressiveMode = this.aggressiveModeToggle.checked;
+    
+    logDebug(`Mise à jour du mode agressif : ${aggressiveMode ? 'activé' : 'désactivé'}`);
+    browser.storage.sync.set({ aggressiveMode })
+      .then(() => {
+        this.aggressiveMode = aggressiveMode;
+        this.afficherMessage(t(aggressiveMode ? 'aggressiveModeEnabled' : 'aggressiveModeDisabled'));
+        logDebug(`Mode agressif ${aggressiveMode ? 'activé' : 'désactivé'}`);
+        browser.tabs.query({active: true, currentWindow: true})
+          .then(tabs => {
+            if (tabs[0]) {
+              browser.tabs.reload(tabs[0].id)
+                .then(() => {
+                  logDebug('Page rechargée avec succès');
+                })
+                .catch(error => {
+                  logDebug('Erreur lors du rechargement de la page:', error);
+                  this.afficherMessage(t('errorReloadingPage'), true);
+                });
+            }
+          })
+          .catch(error => {
+            logDebug('Erreur lors de la récupération des onglets actifs:', error);
+            this.afficherMessage(t('errorGettingActiveTabs'), true);
+          });
+      })
+      .catch(error => {
+        logDebug('Erreur lors de la sauvegarde du mode agressif:', error);
+        this.afficherMessage(t('errorSavingAggressiveMode'), true);
+      });
   }
 }
