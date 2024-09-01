@@ -307,29 +307,41 @@ class Popup {
    * Met à jour le texte de l'interface utilisateur
    */
   updateUIText() {
-    document.getElementById('title').textContent = t('title');
-    document.getElementById('description').textContent = t('description');
-    document.getElementById('hourlyRateLabel').textContent = t('hourlyRate');
-    document.getElementById('hoursPerDayLabel').textContent = t('hoursPerDay');
-    document.getElementById('conversionActiveLabel').textContent = t('conversionActive');
-    document.getElementById('sauvegarder').textContent = t('save');
-    document.getElementById('customCalculationTitle').textContent = t('customCalculation');
-    document.getElementById('prixPersonnalise').placeholder = t('price');
-    document.getElementById('calculerTemps').textContent = t('calculateWorkTime');
-    document.getElementById('openSettings').textContent = t('settings');
-    document.getElementById('settingsTitle').textContent = t('settings');
-    document.getElementById('followSystemThemeLabel').textContent = t('followSystemTheme');
-    document.getElementById('darkModeLabel').textContent = t('darkMode');
-    document.getElementById('backToMain').textContent = t('back');
-    document.getElementById('openAbout').textContent = t('about');
-    document.getElementById('aboutTitle').textContent = t('about');
-    document.getElementById('aboutDescription').textContent = t('aboutDescription');
-    document.getElementById('versionInfo').textContent = t('version') + ': ';
-    document.getElementById('developerInfo').textContent = t('developedBy') + ': ';
-    document.getElementById('websiteInfo').textContent = t('website') + ': ';
-    document.getElementById('sources').textContent = t('sources') + ': ';
-    document.getElementById('backFromAbout').textContent = t('back');
-  
+    const elements = {
+      'title': 'title',
+      'description': 'description',
+      'hourlyRateLabel': 'hourlyRate',
+      'hoursPerDayLabel': 'hoursPerDay',
+      'conversionActiveLabel': 'conversionActive',
+      'sauvegarder': 'save',
+      'customCalculationTitle': 'customCalculation',
+      'prixPersonnalise': 'price',
+      'calculerTemps': 'calculateWorkTime',
+      'openSettings': 'settings',
+      'settingsTitle': 'settings',
+      'followSystemThemeLabel': 'followSystemTheme',
+      'darkModeLabel': 'darkMode',
+      'backToMain': 'back',
+      'openAbout': 'about',
+      'aboutTitle': 'about',
+      'aboutDescription': 'aboutDescription',
+      'versionInfo': 'version',
+      'developerInfo': 'developedBy',
+      'websiteInfo': 'website',
+      'sources': 'sources',
+      'backToMain': 'back',
+      'backFromAbout': 'back'
+    };
+
+    for (const [id, key] of Object.entries(elements)) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = t(key);
+      } else {
+        console.warn(`Element with id '${id}' not found`);
+      }
+    }
+
     // Mise à jour du sélecteur de langue
     this.initLanguage();
   }
@@ -385,6 +397,7 @@ class Popup {
     }
   
     languageLabel.textContent = t('language');
+    console.log('Language label updated:', t('language'));
     
     // Vider le select avant d'ajouter les options
     languageSelect.innerHTML = '';
@@ -392,11 +405,13 @@ class Popup {
     Object.keys(locales).forEach(locale => {
       const option = document.createElement('option');
       option.value = locale;
-      option.textContent = t(locale);
+      option.textContent = locales[currentLocale][locale] || locale;
       languageSelect.appendChild(option);
+      console.log(`Added language option: ${locale} - ${option.textContent}`);
     });
     
     languageSelect.value = currentLocale;
+    console.log('Current language set to:', currentLocale);
     languageSelect.addEventListener('change', (e) => this.changeLanguage(e.target.value));
   }
 
