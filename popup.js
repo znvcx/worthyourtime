@@ -82,6 +82,12 @@ class Popup {
     });
     this.conversionActiveInput.addEventListener('change', () => this.saveOptions());
     this.prixPersonnaliseInput.addEventListener('input', () => this.validateInput(this.prixPersonnaliseInput, 0.01));
+    this.prixPersonnaliseInput.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault(); // Empêche le comportement par défaut de la touche Entrée
+        this.calculerTemps();
+      }
+    });
     this.systemThemeCheckbox.addEventListener('change', () => this.updateThemePreference());
     this.darkModeToggle.addEventListener('change', () => this.updateDarkMode());
     this.openSettingsButton.addEventListener('click', (e) => {
