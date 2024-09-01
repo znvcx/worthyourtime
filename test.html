@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test d'Affichage des Prix</title>
+    <title>Tests de détection des prix</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,6 +19,18 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
         .price {
             color: #007BFF;
         }
@@ -26,42 +38,385 @@
 </head>
 <body>
     <div class="container">
-        <h1>Test d'Affichage des Prix</h1>
-        
-        <div class="price">€10</div>
-        <div class="price">10€</div>
-        <div class="price">€10.99</div>
-        <div class="price">10,99€</div>
-        <div class="price">€1,000.50</div>
-        <div class="price">1 000,50€</div>
-        <div class="price">€1.000,50</div>
-        <div class="price">1.000,50€</div>
-        <div class="price">$10</div>
-        <div class="price">10$</div>
-        <div class="price">$10.99</div>
-        <div class="price">10.99$</div>
-        <div class="price">$1,000.50</div>
-        <div class="price">1,000.50$</div>
-        <div class="price">£10</div>
-        <div class="price">10£</div>
-        <div class="price">£10.99</div>
-        <div class="price">10.99£</div>
-        <div class="price">£1,000.50</div>
-        <div class="price">1,000.50£</div>
-        <div class="price">¥1000</div>
-        <div class="price">1000¥</div>
-        <div class="price">¥1,000.50</div>
-        <div class="price">1 000,50¥</div>
-        <div class="price">CHF 10</div>
-        <div class="price">10 CHF</div>
-        <div class="price">CHF 10.99</div>
-        <div class="price">10.99 CHF</div>
-        <div class="price">CHF 1'000.50</div>
-        <div class="price">1'000.50 CHF</div>
-        <div class="price">₹1000</div>
-        <div class="price">1000₹</div>
-        <div class="price">₹1,000.50</div>
-        <div class="price">1 000,50₹</div>
-    </div>
-</body>
-</html>
+        <h1>Tests de détection des prix</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Numéro du Test</th>
+                    <th>Catégorie</th>
+                    <th>But du Test</th>
+                    <th>Prix à Tester</th>
+                    <th>Résultat Attendu</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Devises sous forme de caractères -->
+                <tr>
+                    <td>1</td>
+                    <td>Devises sous forme de caractères</td>
+                    <td>Devise avant le prix</td>
+                    <td class="price">$55</td>
+                    <td>2.75 heures ($55)</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Devises sous forme de caractères</td>
+                    <td>Devise après le prix</td>
+                    <td class="price">55$</td>
+                    <td>2.75 heures (55$)</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Devises sous forme de caractères</td>
+                    <td>Devise avant le prix avec espace</td>
+                    <td class="price">$ 55</td>
+                    <td>2.75 heures ($ 55)</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Devises sous forme de caractères</td>
+                    <td>Devise après le prix avec espace</td>
+                    <td class="price">55 $</td>
+                    <td>2.75 heures (55 $)</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Devises sous forme de caractères</td>
+                    <td>Devise avant le prix</td>
+                    <td class="price">€55</td>
+                    <td>2.75 heures (€55)</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Devises sous forme de caractères</td>
+                    <td>Devise après le prix</td>
+                    <td class="price">55€</td>
+                    <td>2.75 heures (55€)</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Devises sous forme de caractères</td>
+                    <td>Devise avant le prix avec espace</td>
+                    <td class="price">€ 55</td>
+                    <td>2.75 heures (€ 55)</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Devises sous forme de caractères</td>
+                    <td>Devise après le prix avec espace</td>
+                    <td class="price">55 €</td>
+                    <td>2.75 heures (55 €)</td>
+                </tr>
+
+                <!-- Devises en trois caractères -->
+                <tr>
+                    <td>9</td>
+                    <td>Devises en trois caractères</td>
+                    <td>Devise avant le prix</td>
+                    <td class="price">USD55</td>
+                    <td>2.75 heures (USD55)</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>Devises en trois caractères</td>
+                    <td>Devise après le prix</td>
+                    <td class="price">55USD</td>
+                    <td>2.75 heures (55USD)</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>Devises en trois caractères</td>
+                    <td>Devise avant le prix avec espace</td>
+                    <td class="price">USD 55</td>
+                    <td>2.75 heures (USD 55)</td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td>Devises en trois caractères</td>
+                    <td>Devise après le prix avec espace</td>
+                    <td class="price">55 USD</td>
+                    <td>2.75 heures (55 USD)</td>
+                </tr>
+                <tr>
+                    <td>13</td>
+                    <td>Devises en trois caractères</td>
+                    <td>Devise avant le prix</td>
+                    <td class="price">EUR55</td>
+                    <td>2.75 heures (EUR55)</td>
+                </tr>
+                <tr>
+                    <td>14</td>
+                    <td>Devises en trois caractères</td>
+                    <td>Devise après le prix</td>
+                    <td class="price">55EUR</td>
+                    <td>2.75 heures (55EUR)</td>
+                </tr>
+                <tr>
+                    <td>15</td>
+                    <td>Devises en trois caractères</td>
+                    <td>Devise avant le prix avec espace</td>
+                    <td class="price">EUR 55</td>
+                    <td>2.75 heures (EUR 55)</td>
+                </tr>
+                <tr>
+                    <td>16</td>
+                    <td>Devises en trois caractères</td>
+                    <td>Devise après le prix avec espace</td>
+                    <td class="price">55 EUR</td>
+                    <td>2.75 heures (55 EUR)</td>
+                </tr>
+                <tr>
+                    <td>17</td>
+                    <td>Devises en trois caractères</td>
+                    <td>Devise avant le prix</td>
+                    <td class="price">CHF55</td>
+                    <td>2.75 heures (CHF55)</td>
+                </tr>
+                <tr>
+                    <td>18</td>
+                    <td>Devises en trois caractères</td>
+                    <td>Devise après le prix</td>
+                    <td class="price">55CHF</td>
+                    <td>2.75 heures (55CHF)</td>
+                </tr>
+                <tr>
+                    <td>19</td>
+                    <td>Devises en trois caractères</td>
+                    <td>Devise avant le prix avec espace</td>
+                    <td class="price">CHF 55</td>
+                    <td>2.75 heures (CHF 55)</td>
+                </tr>
+                <tr>
+                    <td>20</td>
+                    <td>Devises en trois caractères</td>
+                    <td>Devise après le prix avec espace</td>
+                    <td class="price">55 CHF</td>
+                    <td>2.75 heures (55 CHF)</td>
+                </tr>
+
+                <!-- Variantes avec des décimales -->
+                <tr>
+                    <td>21</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .-</td>
+                    <td class="price">55.-</td>
+                    <td>2.75 heures (55.-)</td>
+                </tr>
+                <tr>
+                    <td>22</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .00</td>
+                    <td class="price">55.00</td>
+                    <td>2.75 heures (55.00)</td>
+                </tr>
+                <tr>
+                    <td>23</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .55</td>
+                    <td class="price">55.55</td>
+                    <td>2.78 heures (55.55)</td>
+                </tr>
+                <tr>
+                    <td>24</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .- et devise avant</td>
+                    <td class="price">$55.-</td>
+                    <td>2.75 heures ($55.-)</td>
+                </tr>
+                <tr>
+                    <td>25</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .00 et devise avant</td>
+                    <td class="price">$55.00</td>
+                    <td>2.75 heures ($55.00)</td>
+                </tr>
+                <tr>
+                    <td>26</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .55 et devise avant</td>
+                    <td class="price">$55.55</td>
+                    <td>2.78 heures ($55.55)</td>
+                </tr>
+                <tr>
+                    <td>27</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .- et devise après</td>
+                    <td class="price">55.-$</td>
+                    <td>2.75 heures (55.-$)</td>
+                </tr>
+                <tr>
+                    <td>28</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .00 et devise après</td>
+                    <td class="price">55.00$</td>
+                    <td>2.75 heures (55.00$)</td>
+                </tr>
+                <tr>
+                    <td>29</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .55 et devise après</td>
+                    <td class="price">55.55$</td>
+                    <td>2.78 heures (55.55$)</td>
+                </tr>
+                <tr>
+                    <td>30</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .- et devise avant</td>
+                    <td class="price">USD55.-</td>
+                    <td>2.75 heures (USD55.-)</td>
+                </tr>
+                <tr>
+                    <td>31</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .00 et devise avant</td>
+                    <td class="price">USD55.00</td>
+                    <td>2.75 heures (USD55.00)</td>
+                </tr>
+                <tr>
+                    <td>32</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .55 et devise avant</td>
+                    <td class="price">USD55.55</td>
+                    <td>2.78 heures (USD55.55)</td>
+                </tr>
+                <tr>
+                    <td>33</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .- et devise après</td>
+                    <td class="price">55.-USD</td>
+                    <td>2.75 heures (55.-USD)</td>
+                </tr>
+                <tr>
+                    <td>34</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .00 et devise après</td>
+                    <td class="price">55.00USD</td>
+                    <td>2.75 heures (55.00USD)</td>
+                </tr>
+                <tr>
+                    <td>35</td>
+                    <td>Variantes avec des décimales</td>
+                    <td>Prix avec .55 et devise après</td>
+                    <td class="price">55.55USD</td>
+                    <td>2.78 heures (55.55USD)</td>
+                </tr>
+
+                <!-- Séparateurs de milliers -->
+                <tr>
+                    <td>36</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec espace</td>
+                    <td class="price">5 555</td>
+                    <td>277.75 heures (5 555)</td>
+                </tr>
+                <tr>
+                    <td>37</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec apostrophe</td>
+                    <td class="price">5'555</td>
+                    <td>277.75 heures (5'555)</td>
+                </tr>
+                <tr>
+                    <td>38</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec point</td>
+                    <td class="price">5.555</td>
+                    <td>277.75 heures (5.555)</td>
+                </tr>
+                <tr>
+                    <td>39</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec virgule</td>
+                    <td class="price">5,555</td>
+                    <td>277.75 heures (5,555)</td>
+                </tr>
+                <tr>
+                    <td>40</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec espace et décimales</td>
+                    <td class="price">5 555.55</td>
+                    <td>277.78 heures (5 555.55)</td>
+                </tr>
+                <tr>
+                    <td>41</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec apostrophe et décimales</td>
+                    <td class="price">5'555.55</td>
+                    <td>277.78 heures (5'555.55)</td>
+                </tr>
+                <tr>
+                    <td>42</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec point et décimales</td>
+                    <td class="price">5.555,55</td>
+                    <td>277.78 heures (5.555,55)</td>
+                </tr>
+                <tr>
+                    <td>43</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec virgule et décimales</td>
+                    <td class="price">5,555.55</td>
+                    <td>277.78 heures (5,555.55)</td>
+                </tr>
+                <tr>
+                    <td>44</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec espace et devise avant</td>
+                    <td class="price">$5 555</td>
+                    <td>277.75 heures ($5 555)</td>
+                </tr>
+                <tr>
+                    <td>45</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec apostrophe et devise avant</td>
+                    <td class="price">$5'555</td>
+                    <td>277.75 heures ($5'555)</td>
+                </tr>
+                <tr>
+                    <td>46</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec point et devise avant</td>
+                    <td class="price">$5.555</td>
+                    <td>277.75 heures ($5.555)</td>
+                </tr>
+                <tr>
+                    <td>47</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec virgule et devise avant</td>
+                    <td class="price">$5,555</td>
+                    <td>277.75 heures ($5,555)</td>
+                </tr>
+                <tr>
+                    <td>48</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec espace, décimales et devise avant</td>
+                    <td class="price">$5 555.55</td>
+                    <td>277.78 heures ($5 555.55)</td>
+                </tr>
+                <tr>
+                    <td>49</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec apostrophe, décimales et devise avant</td>
+                    <td class="price">$5'555.55</td>
+                    <td>277.78 heures ($5'555.55)</td>
+                </tr>
+                <tr>
+                    <td>50</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec point, décimales et devise avant</td>
+                    <td class="price">$5.555,55</td>
+                    <td>277.78 heures ($5.555,55)</td>
+                </tr>
+                <tr>
+                    <td>51</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec virgule, décimales et devise avant</td>
+                    <td class="price">$5,555.55</td>
+                    <td>277.78 heures ($5,555.55)</td>
+                </tr>
+                <tr>
+                    <td>52</td>
+                    <td>Séparateurs de milliers</td>
+                    <td>Prix avec espace et devise après</td>
+                    <td class="price">5 555$</td>
+                    <td>277.75 heures (5 555$)</td

@@ -43,19 +43,19 @@ function remplacerPrix() {
     logDebug("Remplacement des prix");
     
     // Expression régulière pour détecter les prix
-    const regex = /(?<!\d)(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)\s*)?(\d{1,3}(?:[ '\u00A0]\d{3})*(?:[.,]\d{1,2})?)\s*(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)|\.–|\.-)?(?!\d)/g;
-
+    const regex = /(?<!\d)(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)\s*)?(\d{1,3}(?:[.,\s']\d{3})*(?:[.,]\d{2})?)\s*(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)|\.–|\.-)?(?!\d)/g;
+    
     function convertirPrix(match, deviseBefore, prix, deviseAfter) {
         if (!prix) {
             logDebug("Prix non trouvé dans le match:", match);
             return match;
         }
         const devise = deviseBefore || deviseAfter;
-        // Vérifier si le match est vraiment un prix
-        if (!devise && !match.includes('.–') && !match.includes('.-')) {
-            return match; // Ce n'est probablement pas un prix, on ne le convertit pas
+        if (!devise && !match.includes('.–') && !match.includes('.-') && !/\d{1,3}(?:[.,\s']\d{3})*(?:[.,]\d{2})?/.test(prix)) {
+            return match;
         }
-        const prixNumerique = parseFloat(prix.replace(/[' \u00A0]/g, '').replace(',', '.'));
+        // Remplacer les séparateurs de milliers par rien et les séparateurs décimaux par un point
+        const prixNumerique = parseFloat(prix.replace(/(\d)[.,\s'](\d{3})/g, '$1$2').replace(',', '.'));
         const tempsEnHeures = prixNumerique / tauxHoraire;
         const tempsFormate = formatTemps(tempsEnHeures, heuresParJour);
         return `${tempsFormate} (${match})`;
