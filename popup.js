@@ -45,6 +45,10 @@ class Popup {
     this.backFromAboutButton = document.getElementById('backFromAbout');
     this.debugModeToggle = document.getElementById('debugModeToggle');
     this.aggressiveModeToggle = document.getElementById('aggressiveModeToggle');
+    this.listsManagementContent = document.getElementById('lists-management-content');
+    this.urlList = [];
+    this.isWhitelistMode = true;
+    this.listModeToggle = document.getElementById('listModeToggle');
 
     // Liaison des méthodes
     this.loadOptions = this.loadOptions.bind(this);
@@ -55,7 +59,7 @@ class Popup {
     this.setupEventListeners();
     this.setupSystemThemeListener();
     this.updateUI();
-    
+    this.initUrlLists();
   }
 
   /**
@@ -115,6 +119,15 @@ class Popup {
     });
     this.debugModeToggle.addEventListener('change', () => this.updateDebugMode());
     this.aggressiveModeToggle.addEventListener('change', () => this.updateAggressiveMode());
+    document.getElementById('openListsManagement').addEventListener('click', (e) => {
+      e.preventDefault();
+      this.showListsManagementContent();
+    });
+    document.getElementById('backFromListsManagement').addEventListener('click', (e) => {
+      e.preventDefault();
+      this.showSettingsContent();
+    });
+    this.listModeToggle.addEventListener('change', () => this.toggleListMode());
   }
 
   /**
@@ -124,7 +137,7 @@ class Popup {
     this.mainContent.style.display = 'block';
     this.settingsContent.style.display = 'none';
     this.aboutContent.style.display = 'none';
-    
+    this.listsManagementContent.style.display = 'none';
   }
 
   /**
@@ -134,7 +147,7 @@ class Popup {
     this.mainContent.style.display = 'none';
     this.settingsContent.style.display = 'block';
     this.aboutContent.style.display = 'none';
-    
+    this.listsManagementContent.style.display = 'none';
   }
 
   /**
@@ -144,7 +157,15 @@ class Popup {
     this.mainContent.style.display = 'none';
     this.settingsContent.style.display = 'none';
     this.aboutContent.style.display = 'block';
-    
+    this.listsManagementContent.style.display = 'none';
+  }
+
+  showListsManagementContent() {
+    this.mainContent.style.display = 'none';
+    this.settingsContent.style.display = 'none';
+    this.aboutContent.style.display = 'none';
+    this.listsManagementContent.style.display = 'block';
+    this.updateUrlListUI();
   }
 
   /**
@@ -160,6 +181,8 @@ class Popup {
       language: 'en',
       debugMode: false,
       aggressiveMode: false,
+      urlList: [],
+      isWhitelistMode: true
     }).then(data => {
       // Vérifiez que les éléments existent avant d'assigner les valeurs
       if (this.tauxHoraireInput) this.tauxHoraireInput.value = data.tauxHoraire;
@@ -178,10 +201,15 @@ class Popup {
       this.useSystemTheme = data.useSystemTheme;
       this.debugMode = data.debugMode;
       this.aggressiveMode = data.aggressiveMode;
+      this.urlList = data.urlList || [];
+      this.isWhitelistMode = data.isWhitelistMode !== undefined ? data.isWhitelistMode : true;
       setLocale(data.language);
       setDebugMode(this.debugMode);
       this.updateUITheme();
       this.updateUI();
+      this.updateUrlListUI();
+      this.updateListModeUI();
+      this.listModeToggle.checked = this.isWhitelistMode;
       
     }).catch(error => {
       logDebug('Error loading options:', error);
@@ -323,10 +351,63 @@ class Popup {
       'developerInfo': 'developedBy',
       'websiteInfo': 'website',
       'sources': 'sources',
-      'backToMain': 'back',
       'backFromAbout': 'back',
       'debugModeLabel': 'debugMode',
-      'aggressiveModeLabel': 'aggressiveMode'
+      'aggressiveModeLabel': 'aggressiveMode',
+      'whitelistTitle': 'whitelistTitle',
+      'blacklistTitle': 'blacklistTitle',
+      'addToWhitelist': 'addToWhitelist',
+      'addToBlacklist': 'addToBlacklist',
+      'whitelistInputPlaceholder': 'whitelistInputPlaceholder',
+      'blacklistInputPlaceholder': 'blacklistInputPlaceholder',
+      'listsManagementTitle': 'listsManagementTitle',
+      'backFromListsManagement': 'backFromListsManagement',
+      'whitelist': 'whitelist',
+      'blacklist': 'blacklist',
+      'openListsManagement': 'openListsManagement',
+      'versionLabel': 'version',
+      'developedByLabel': 'developedBy',
+      'websiteLabel': 'website',
+      'sourcesLabel': 'sources',
+      'settingsSaved': 'settingsSaved',
+      'errorLoadingOptions': 'errorLoadingOptions',
+      'errorSavingSettings': 'errorSavingSettings',
+      'errorReloadingPage': 'errorReloadingPage',
+      'errorSavingTheme': 'errorSavingTheme',
+      'themePreferencesSaved': 'themePreferencesSaved',
+      'errorSavingDarkMode': 'errorSavingDarkMode',
+      'darkModeDisabled': 'darkModeDisabled', 
+      'darkModeEnabled': 'darkModeEnabled',
+      'errorSavingDebugMode': 'errorSavingDebugMode',
+      'debugModeChanged': 'debugModeChanged',
+      'errorSavingAggressiveMode': 'errorSavingAggressiveMode',
+      'aggressiveModeDisabled': 'aggressiveModeDisabled',
+      'aggressiveModeEnabled': 'aggressiveModeEnabled',
+      'errorGettingActiveTabs': 'errorGettingActiveTabs',
+      'urlListsUpdated': 'urlListsUpdated', 
+      'errorSavingUrlLists': 'errorSavingUrlLists',
+      'errorLoadingUrlLists': 'errorLoadingUrlLists',
+      'errorUpdatingUrlLists': 'errorUpdatingUrlLists',
+      'errorRemovingUrlFromLists': 'errorRemovingUrlFromLists',
+      'errorAddingUrlToLists': 'errorAddingUrlToLists',
+      'errorGettingUrlLists': 'errorGettingUrlLists',
+      'errorSavingUrlList': 'errorSavingUrlList',
+      'errorLoadingUrlList': 'errorLoadingUrlList',
+      'errorUpdatingUrlList': 'errorUpdatingUrlList',
+      'errorRemovingUrlFromList': 'errorRemovingUrlFromList',
+      'errorAddingUrlToList': 'errorAddingUrlToList',
+      'addActiveUrlToWhitelist': 'addActiveUrlToWhitelist',
+      'addActiveUrlToBlacklist': 'addActiveUrlToBlacklist',
+      'whitelistUrlAdded': 'whitelistUrlAdded',
+      'blacklistUrlAdded': 'blacklistUrlAdded',
+      'whitelistUrlExists': 'whitelistUrlExists',
+      'blacklistUrlExists': 'blacklistUrlExists',
+      'errorGettingActiveTab': 'errorGettingActiveTab',
+      'listModeLabel': 'listModeLabel',
+      'addToList': 'addToList',
+      'addActiveUrlToList': 'addActiveUrlToList',
+      'urlAdded': 'urlAdded',
+      'urlExists': 'urlExists'
     };
 
     for (const [id, key] of Object.entries(elements)) {
@@ -487,5 +568,110 @@ class Popup {
         logDebug('Erreur lors de la sauvegarde du mode agressif:', error);
         this.afficherMessage(t('errorSavingAggressiveMode'), true);
       });
+  }
+
+  initUrlLists() {
+    this.urlList = [];
+    this.loadUrlLists();
+    this.setupUrlListListeners();
+  }
+
+  loadUrlLists() {
+    browser.storage.sync.get(['urlList', 'isWhitelistMode']).then(data => {
+      this.urlList = data.urlList || [];
+      this.isWhitelistMode = data.isWhitelistMode !== undefined ? data.isWhitelistMode : true;
+      this.updateUrlListUI();
+      this.updateListModeUI();
+      this.listModeToggle.checked = this.isWhitelistMode;
+    });
+  }
+
+  updateUrlListUI() {
+    const urlListEl = document.getElementById('urlList');
+    urlListEl.innerHTML = this.urlList.map(url => `
+      <tr>
+        <td>${url}</td>
+        <td><button class="button remove-url" data-url="${url}">X</button></td>
+      </tr>
+    `).join('');
+  }
+
+  setupUrlListListeners() {
+    document.getElementById('addToList').addEventListener('click', () => this.addToList());
+    document.getElementById('addActiveUrlToList').addEventListener('click', () => this.addActiveUrlToList());
+    
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('remove-url')) {
+        this.removeFromList(e.target.dataset.url);
+      }
+    });
+  
+    document.getElementById('urlInput').addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        this.addToList();
+      }
+    });
+  }
+
+  toggleListMode() {
+    this.isWhitelistMode = this.listModeToggle.checked;
+    this.saveListMode();
+    this.updateListModeUI();
+  }
+
+  updateListModeUI() {
+    document.getElementById('listModeLabel').textContent = this.isWhitelistMode ? t('listModeLabel') : t('listModeLabel').replace('blanche', 'noire').replace('Whitelist', 'Blacklist');
+  }
+
+  saveListMode() {
+    browser.storage.sync.set({ isWhitelistMode: this.isWhitelistMode })
+      .then(() => this.afficherMessage(t('settingsSaved')))
+      .catch(error => this.afficherMessage(t('errorSavingSettings'), true));
+  }
+
+  addToList() {
+    const input = document.getElementById('urlInput');
+    const url = input.value.trim();
+    if (url && !this.urlList.includes(url)) {
+      this.urlList.push(url);
+      this.saveUrlList();
+      input.value = '';
+      this.updateUrlListUI();
+    }
+  }
+
+  addActiveUrlToList() {
+    browser.tabs.query({active: true, currentWindow: true})
+      .then(tabs => {
+        if (tabs[0]) {
+          const url = new URL(tabs[0].url).hostname;
+          if (!this.urlList.includes(url)) {
+            this.urlList.push(url);
+            this.saveUrlList();
+            this.afficherMessage(t('urlAdded'));
+          } else {
+            this.afficherMessage(t('urlExists'));
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error getting active tab:', error);
+        this.afficherMessage(t('errorGettingActiveTab'), true);
+      });
+  }
+
+  removeFromList(url) {
+    this.urlList = this.urlList.filter(item => item !== url);
+    this.saveUrlList();
+  }
+
+  saveUrlList() {
+    browser.storage.sync.set({ urlList: this.urlList })
+      .then(() => {
+        this.updateUrlListUI();
+        this.afficherMessage(t('urlListsUpdated'));
+      })
+      .catch(error => this.afficherMessage(t('errorSavingUrlLists'), true));
   }
 }

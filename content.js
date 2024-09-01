@@ -10,22 +10,28 @@ let conversionActive = true;
 let tauxHoraire, heuresParJour;
 let debugMode = false;
 let aggressiveMode = false;
+let urlList = [];
+let isWhitelistMode = true;
 
 /**
  * Initialise l'extension en chargeant les options et en configurant les écouteurs d'événements
  */
 function initialiserExtension() {
     logDebug("Initialisation de l'extension");
-    browser.storage.sync.get(['tauxHoraire', 'heuresParJour', 'conversionActive', 'debugMode', 'aggressiveMode']).then(data => {
+    browser.storage.sync.get(['tauxHoraire', 'heuresParJour', 'conversionActive', 'debugMode', 'aggressiveMode', 'urlList', 'isWhitelistMode']).then(data => {
         logDebug("Données récupérées", data);
         conversionActive = data.conversionActive !== undefined ? data.conversionActive : true;
         tauxHoraire = data.tauxHoraire || 20;
         heuresParJour = data.heuresParJour || 8.5;
         debugMode = data.debugMode || false;
         aggressiveMode = data.aggressiveMode || false;
+        urlList = data.urlList || [];
+        isWhitelistMode = data.isWhitelistMode !== undefined ? data.isWhitelistMode : true;
         setDebugMode(debugMode);
         logDebug(`Mode agressif : ${aggressiveMode ? 'activé' : 'désactivé'}`);
-        mettreAJourPrixConvertis();
+        if (shouldApplyConversion()) {
+            mettreAJourPrixConvertis();
+        }
     }).catch(error => {
         console.error("Erreur lors de la récupération des paramètres :", error);
     });
@@ -104,6 +110,15 @@ function restaurerPrixOriginaux() {
         }
     });
     prixOriginaux.clear();
+}
+
+function shouldApplyConversion() {
+  const currentUrl = window.location.hostname;
+  if (isWhitelistMode) {
+    return urlList.includes(currentUrl);
+  } else {
+    return !urlList.includes(currentUrl);
+  }
 }
 
 // Initialiser l'extension 

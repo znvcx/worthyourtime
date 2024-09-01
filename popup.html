@@ -78,12 +78,39 @@
         <span class="slider round"></span>
       </label>
     </div>
+    <button id="openListsManagement" class="button">
+      <span id="listsManagementTitle"></span>
+    </button>
     <div class="settings-link">
       <a href="#" id="openAbout"></a>
     </div>
     <div class="settings-link">
       <button id="backToMain" class="button"></button>
     </div>    
+  </div>
+
+  <div id="lists-management-content" class="container" style="display: none;">
+    <h2 id="listsManagementTitle"></h2>
+    <div class="switch-label">
+      <span id="listModeLabel"></span>
+      <label class="switch">
+        <input type="checkbox" id="listModeToggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <table id="urlListTable">
+      <tbody id="urlList"></tbody>
+      <tfoot>
+        <tr>
+          <td><input type="text" id="urlInput" placeholder="Ajouter une URL"></td>
+          <td>
+            <button id="addToList" class="button"></button>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+    <button id="addActiveUrlToList" class="button"></button>
+    <button id="backFromListsManagement" class="button"></button>
   </div>
 
   <div id="about-content" class="container" style="display: none;">
