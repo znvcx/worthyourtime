@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tests de détection des prix</title>
+    <title>Test d'Affichage des Prix</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,12 +12,14 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
         }
         .container {
             background-color: #fff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
         table {
             width: 100%;
@@ -34,11 +36,28 @@
         .price {
             color: #007BFF;
         }
+        .input-container {
+            margin-bottom: 20px;
+        }
+        .input-container input {
+            padding: 8px;
+            font-size: 16px;
+        }
+        .input-container span {
+            margin-left: 10px;
+            font-size: 16px;
+            color: #007BFF;
+        }
     </style>
 </head>
 <body>
+    <div class="input-container">
+        <label for="priceInput">Entrez un prix :</label>
+        <input type="text" id="priceInput" placeholder="Ex: 5 555'555.55">
+        <span id="priceOutput"></span>
+    </div>
     <div class="container">
-        <h1>Tests de détection des prix</h1>
+        <h1>Test d'Affichage des Prix</h1>
         <table>
             <thead>
                 <tr>
@@ -407,16 +426,111 @@
                     <td class="price">$5.555,55</td>
                     <td>277.78 heures ($5.555,55)</td>
                 </tr>
-                <tr>
-                    <td>51</td>
-                    <td>Séparateurs de milliers</td>
-                    <td>Prix avec virgule, décimales et devise avant</td>
-                    <td class="price">$5,555.55</td>
-                    <td>277.78 heures ($5,555.55)</td>
-                </tr>
-                <tr>
-                    <td>52</td>
-                    <td>Séparateurs de milliers</td>
-                    <td>Prix avec espace et devise après</td>
-                    <td class="price">5 555$</td>
-                    <td>277.75 heures (5 555$)</td
+<tr>
+    <td>51</td>
+    <td>Séparateurs de milliers</td>
+    <td>Prix avec virgule, décimales et devise avant</td>
+    <td class="price">$5,555.55</td>
+    <td>277.78 heures ($5,555.55)</td>
+</tr>
+<tr>
+    <td>52</td>
+    <td>Séparateurs de milliers</td>
+    <td>Prix avec espace et devise après</td>
+    <td class="price">5 555$</td>
+    <td>277.75 heures (5 555$)</td>
+</tr>
+<tr>
+    <td>53</td>
+    <td>Séparateurs de milliers</td>
+    <td>Prix avec apostrophe et devise après</td>
+    <td class="price">5'555$</td>
+    <td>277.75 heures (5'555$)</td>
+</tr>
+<tr>
+    <td>54</td>
+    <td>Séparateurs de milliers</td>
+    <td>Prix avec point et devise après</td>
+    <td class="price">5.555$</td>
+    <td>277.75 heures (5.555$)</td>
+</tr>
+<tr>
+    <td>55</td>
+    <td>Séparateurs de milliers</td>
+    <td>Prix avec virgule et devise après</td>
+    <td class="price">5,555$</td>
+    <td>277.75 heures (5,555$)</td>
+</tr>
+<tr>
+    <td>56</td>
+    <td>Séparateurs de milliers</td>
+    <td>Prix avec espace, décimales et devise après</td>
+    <td class="price">5 555.55$</td>
+    <td>277.78 heures (5 555.55$)</td>
+</tr>
+<tr>
+    <td>57</td>
+    <td>Séparateurs de milliers</td>
+    <td>Prix avec apostrophe, décimales et devise après</td>
+    <td class="price">5'555.55$</td>
+    <td>277.78 heures (5'555.55$)</td>
+</tr>
+<tr>
+    <td>58</td>
+    <td>Séparateurs de milliers</td>
+    <td>Prix avec point, décimales et devise après</td>
+    <td class="price">5.555,55$</td>
+    <td>277.78 heures (5.555,55$)</td>
+</tr>
+<tr>
+    <td>59</td>
+    <td>Séparateurs de milliers</td>
+    <td>Prix avec virgule, décimales et devise après</td>
+    <td class="price">5,555.55$</td>
+    <td>277.78 heures (5,555.55$)</td>
+</tr>
+<tr>
+    <td>60</td>
+    <td>Cas complexes</td>
+    <td>Devise avant, espace comme séparateur des milliers, .- pour les décimales</td>
+    <td class="price">CHF 5 555.-</td>
+    <td>277.75 heures (CHF 5 555.-)</td>
+</tr>
+<tr>
+    <td>61</td>
+    <td>Cas complexes</td>
+    <td>Devise après, apostrophe comme séparateur des milliers, .00 pour les décimales</td>
+    <td class="price">5'555.00 CHF</td>
+    <td>277.75 heures (5'555.00 CHF)</td>
+</tr>
+<tr>
+    <td>62</td>
+    <td>Cas complexes</td>
+    <td>Devise avant, point comme séparateur des milliers, .55 pour les décimales</td>
+    <td class="price">USD 5.555,55</td>
+    <td>277.78 heures (USD 5.555,55)</td>
+</tr>
+<tr>
+    <td>63</td>
+    <td>Cas complexes</td>
+    <td>Devise après, virgule comme séparateur des milliers, .55 pour les décimales</td>
+    <td class="price">5,555.55 USD</td>
+    <td>277.78 heures (5,555.55 USD)</td>
+</tr>
+<tr>
+    <td>64</td>
+    <td>Cas complexes</td>
+    <td>Devise avant, espace et apostrophe comme séparateurs des milliers, .55 pour les décimales</td>
+    <td class="price">€ 5 555'555.55</td>
+    <td>27777.78 heures (€ 5 555'555.55)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<script>
+document.getElementById('priceInput').addEventListener('input', function() {
+document.getElementById('priceOutput').textContent = this.value;
+});
+</script>
+</body>
+</html>

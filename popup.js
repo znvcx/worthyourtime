@@ -147,7 +147,8 @@ class Popup {
       darkMode: false,
       useSystemTheme: false,
       language: 'en',
-      debugMode: false
+      debugMode: false,
+      aggressiveMode: false,
     }).then(data => {
       // Vérifiez que les éléments existent avant d'assigner les valeurs
       if (this.tauxHoraireInput) this.tauxHoraireInput.value = data.tauxHoraire;
@@ -156,6 +157,7 @@ class Popup {
       if (this.darkModeToggle) this.darkModeToggle.checked = data.darkMode;
       if (this.systemThemeCheckbox) this.systemThemeCheckbox.checked = data.useSystemTheme;
       if (this.debugModeToggle) this.debugModeToggle.checked = data.debugMode;
+      if (this.aggressiveModeToggle) this.aggressiveModeToggle.checked = data.aggressiveMode;
       
       // Stockez également les valeurs dans les propriétés de la classe
       this.tauxHoraire = data.tauxHoraire;
@@ -164,7 +166,7 @@ class Popup {
       this.darkMode = data.darkMode;
       this.useSystemTheme = data.useSystemTheme;
       this.debugMode = data.debugMode;
-      
+      this.aggressiveMode = data.aggressiveMode;
       setLocale(data.language);
       setDebugMode(this.debugMode);
       this.updateUITheme();
@@ -183,8 +185,12 @@ class Popup {
     const heuresParJour = validateNumber(this.heuresParJourInput.value, 0.1, 24, 8);
     const conversionActive = this.conversionActiveInput.checked;
     const debugMode = this.debugModeToggle.checked;
+    const aggressiveMode = this.aggressiveModeToggle.checked;
 
-    browser.storage.sync.set({ tauxHoraire, heuresParJour, conversionActive, debugMode })
+    logDebug(`Sauvegarde des options - Mode agressif : ${aggressiveMode ? 'activé' : 'désactivé'}`);
+
+    browser.storage.sync.set({ tauxHoraire, heuresParJour, conversionActive, debugMode, aggressiveMode })
+
       .then(() => {
         this.afficherMessage(t('settingsSaved'));
         browser.tabs.query({active: true, currentWindow: true})
@@ -301,7 +307,8 @@ class Popup {
       'sources': 'sources',
       'backToMain': 'back',
       'backFromAbout': 'back',
-      'debugModeLabel': 'debugMode'
+      'debugModeLabel': 'debugMode',
+      'aggressiveModeLabel': 'aggressiveMode'
     };
 
     for (const [id, key] of Object.entries(elements)) {

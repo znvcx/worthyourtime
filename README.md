@@ -35,6 +35,7 @@ You can customize the following settings:
 - Enable/disable automatic conversion
 - Language (English or French)
 - Theme (light, dark, or follow system theme)
+- Aggressive mode: Choose between aggressive mode (converts more prices but may affect page layout) and gentle mode (more conservative, preserves visual integrity of websites)
 - Debug mode: Enable or disable debug mode to display debugging information in the console
 
 ## Debug Mode
@@ -45,6 +46,21 @@ Debug mode allows you to display debugging information in the browser console. T
 2. Go to the settings by clicking on the settings icon.
 3. Enable or disable the "Debug mode" switch.
 4. Debugging information will be displayed in the browser console.
+
+## Aggressive Mode
+Aggressive mode allows you to choose between two price conversion strategies:
+
+1. **Aggressive Mode (default: off)**: This mode attempts to convert more prices on web pages. It may catch more prices, but it could potentially affect the layout of some websites.
+
+2. **Gentle Mode**: This is a more conservative approach. It converts fewer prices but is less likely to interfere with the website's visual layout.
+
+### Enable or disable Aggressive Mode
+1. Open the extension popup by clicking on the extension icon in the browser toolbar.
+2. Go to the settings by clicking on the settings icon.
+3. Enable or disable the "Aggressive mode" switch.
+4. The changes will be applied immediately to the current page and all future pages.
+
+Choose the mode that best suits your needs and browsing experience.
 
 ## Project Structure
 <pre>
@@ -73,7 +89,7 @@ worth-your-time/
 
 ### Key Functions
 - **Popup class in popup.js:** Manages the popup user interface and interactions.
-- **remplacerPrix() in content.js:** Converts prices on web pages.
+- **remplacerPrix() in content.js:** Converts prices on web pages, using either aggressive or gentle mode depending on user settings.
 - **formatTemps():** Formats the calculated work time into days, hours, and minutes.
 - **logDebug():** Displays debugging information in the console if debug mode is enabled.
 - **setDebugMode():** Enables or disables debug mode.

@@ -6,19 +6,22 @@ let prixOriginaux = new Map();
 let conversionActive = true;
 let tauxHoraire, heuresParJour;
 let debugMode = false;
+let aggressiveMode = false;
 
 /**
  * Initialise l'extension en chargeant les options et en configurant les écouteurs d'événements
  */
 function initialiserExtension() {
     logDebug("Initialisation de l'extension");
-    browser.storage.sync.get(['tauxHoraire', 'heuresParJour', 'conversionActive', 'debugMode']).then(data => {
+    browser.storage.sync.get(['tauxHoraire', 'heuresParJour', 'conversionActive', 'debugMode', 'aggressiveMode']).then(data => {
         logDebug("Données récupérées", data);
         conversionActive = data.conversionActive !== undefined ? data.conversionActive : true;
         tauxHoraire = data.tauxHoraire || 20;
         heuresParJour = data.heuresParJour || 8.5;
         debugMode = data.debugMode || false;
+        aggressiveMode = data.aggressiveMode || false;
         setDebugMode(debugMode);
+        logDebug(`Mode agressif : ${aggressiveMode ? 'activé' : 'désactivé'}`);
         mettreAJourPrixConvertis();
     }).catch(error => {
         console.error("Erreur lors de la récupération des paramètres :", error);
@@ -42,9 +45,15 @@ function mettreAJourPrixConvertis() {
 function remplacerPrix() {
     logDebug("Remplacement des prix");
     
-    // Expression régulière pour détecter les prix
-    const regex = /(?<!\d)(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)\s*)?(\d{1,3}(?:[.,\s']\d{3})*(?:[.,]\d{2})?)\s*(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)|\.–|\.-)?(?!\d)/g;
+    // Expression régulière pour le mode agressif (existante)
+    const regexAgressif = /(?<!\d)(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)\s*)?(\d{1,3}(?:[.,\s']\d{3})*(?:[.,]\d{2})?)\s*(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)|\.–|\.-)?(?!\d)/g;
     
+    // Expression régulière pour le mode doux (nouvelle)
+    const regexDoux = /(?<!\d)(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)\s*)?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)\s*(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)|\.–|\.-)?(?!\d)/g;
+
+    const regex = aggressiveMode ? regexAgressif : regexDoux;
+    logDebug(`Mode utilisé pour la regex : ${aggressiveMode ? 'agressif' : 'doux'}`);
+
     function convertirPrix(match, deviseBefore, prix, deviseAfter) {
         if (!prix) {
             logDebug("Prix non trouvé dans le match:", match);
@@ -128,7 +137,9 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             tauxHoraire = data.tauxHoraire;
             heuresParJour = data.heuresParJour;
             debugMode = data.debugMode;
+            aggressiveMode = data.aggressiveMode;
             setDebugMode(debugMode);
+            logDebug(`Mode agressif : ${aggressiveMode ? 'activé' : 'désactivé'}`);
             mettreAJourPrixConvertis();
         });
     }

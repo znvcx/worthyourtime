@@ -35,7 +35,8 @@ window.locales = {
       fr: "Français",
       debugMode: "Mode Debug",
       debugModeChanged: "Mode Debug activé",
-      errorSavingDebugMode: "Erreur lors de la sauvegarde du mode Debug"
+      errorSavingDebugMode: "Erreur lors de la sauvegarde du mode Debug",
+      aggressiveMode: "Mode agressif"
     },
     en: {
       title: "Worth Your Time?",
@@ -73,6 +74,7 @@ window.locales = {
       fr: "French",
       debugMode: "Debug Mode",
       debugModeChanged: "Debug Mode enabled",
-      errorSavingDebugMode: "Error saving Debug Mode"
+      errorSavingDebugMode: "Error saving Debug Mode",
+      aggressiveMode: "Aggressive Mode"
     }
   };
