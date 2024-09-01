@@ -32,7 +32,10 @@ window.locales = {
       languageChanged: "Langage changé",
       language: "Langue",
       en: "Anglais",
-      fr: "Français"
+      fr: "Français",
+      debugMode: "Mode Debug",
+      debugModeChanged: "Mode Debug activé",
+      errorSavingDebugMode: "Erreur lors de la sauvegarde du mode Debug"
     },
     en: {
       title: "Worth Your Time?",
@@ -67,6 +70,9 @@ window.locales = {
       languageChanged: "Language changed",
       language: "Language",
       en: "English",
-      fr: "French"
+      fr: "French",
+      debugMode: "Debug Mode",
+      debugModeChanged: "Debug Mode enabled",
+      errorSavingDebugMode: "Error saving Debug Mode"
     }
   };

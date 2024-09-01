@@ -1,10 +1,11 @@
+import { logDebug, setDebugMode, formatTemps, validateNumber } from './utils.js';
 // Importation des traductions depuis le fichier locales.js
 const locales = window.locales;
 
 // Définition de la langue par défaut
 let currentLocale = 'en'; // Anglais par défaut
 
-// Attente du chargement complet du DOM avant d'initialiser l'extension
+// Initialisation
 document.addEventListener('DOMContentLoaded', () => {
   const popup = new Popup();
   popup.init();
@@ -20,45 +21,7 @@ function t(key) {
   return locales[currentLocale][key] || key;
 }
 
-// Fonctions utilitaires
-
-/**
- * Formate le temps en jours, heures et minutes
- * @param {number} heures - Nombre total d'heures
- * @param {number} heuresParJour - Nombre d'heures de travail par jour
- * @return {string} Temps formaté
- */
-function formatTemps(heures, heuresParJour) {
-  const jours = Math.floor(heures / heuresParJour);
-  const heuresRestantes = Math.floor(heures % heuresParJour);
-  const minutes = Math.round((heures % 1) * 60);
-  
-  let resultat = '';
-  if (jours > 0) resultat += `${jours}j `;
-  if (heuresRestantes > 0 || (jours === 0 && minutes === 0)) resultat += `${heuresRestantes}h `;
-  if (minutes > 0) resultat += `${minutes}m`;
-  return resultat.trim();
-}
-
-/**
- * Valide et ajuste une valeur numérique dans une plage donnée
- * @param {string|number} value - Valeur à valider
- * @param {number} min - Valeur minimale autorisée
- * @param {number} max - Valeur maximale autorisée (optionnelle)
- * @param {number} defaultValue - Valeur par défaut si la valeur est invalide
- * @return {number} Valeur validée
- */
-function validateNumber(value, min, max, defaultValue) {
-  const num = parseFloat(value);
-  if (isNaN(num)) return defaultValue !== undefined ? defaultValue : min;
-  if (num < min) return min;
-  if (max !== undefined && num > max) return max;
-  return num;
-}
-
-/**
- * Classe principale gérant l'interface utilisateur du popup
- */
+// Classe principale gérant l'interface utilisateur du popup
 class Popup {
   /**
    * Initialise les éléments de l'interface et charge les options
@@ -80,6 +43,7 @@ class Popup {
     this.backToMainButton = document.getElementById('backToMain');
     this.openAboutButton = document.getElementById('openAbout');
     this.backFromAboutButton = document.getElementById('backFromAbout');
+    this.debugModeToggle = document.getElementById('debugModeToggle');
 
     // Liaison des méthodes
     this.loadOptions = this.loadOptions.bind(this);
@@ -142,6 +106,7 @@ class Popup {
       e.preventDefault();
       this.showSettingsContent();
     });
+    this.debugModeToggle.addEventListener('change', () => this.updateDebugMode());
   }
 
   /**
@@ -181,7 +146,8 @@ class Popup {
       conversionActive: true,
       darkMode: false,
       useSystemTheme: false,
-      language: 'en'
+      language: 'en',
+      debugMode: false
     }).then(data => {
       // Vérifiez que les éléments existent avant d'assigner les valeurs
       if (this.tauxHoraireInput) this.tauxHoraireInput.value = data.tauxHoraire;
@@ -189,6 +155,7 @@ class Popup {
       if (this.conversionActiveInput) this.conversionActiveInput.checked = data.conversionActive;
       if (this.darkModeToggle) this.darkModeToggle.checked = data.darkMode;
       if (this.systemThemeCheckbox) this.systemThemeCheckbox.checked = data.useSystemTheme;
+      if (this.debugModeToggle) this.debugModeToggle.checked = data.debugMode;
       
       // Stockez également les valeurs dans les propriétés de la classe
       this.tauxHoraire = data.tauxHoraire;
@@ -196,12 +163,14 @@ class Popup {
       this.conversionActive = data.conversionActive;
       this.darkMode = data.darkMode;
       this.useSystemTheme = data.useSystemTheme;
+      this.debugMode = data.debugMode;
       
       setLocale(data.language);
+      setDebugMode(this.debugMode);
       this.updateUITheme();
       this.updateUI();
     }).catch(error => {
-      console.error('Error loading options:', error);
+      logDebug('Error loading options:', error);
       this.afficherMessage(t('errorLoadingOptions'), true);
     });
   }
@@ -213,8 +182,9 @@ class Popup {
     const tauxHoraire = validateNumber(this.tauxHoraireInput.value, 0.01, undefined, 20);
     const heuresParJour = validateNumber(this.heuresParJourInput.value, 0.1, 24, 8);
     const conversionActive = this.conversionActiveInput.checked;
+    const debugMode = this.debugModeToggle.checked;
 
-    browser.storage.sync.set({ tauxHoraire, heuresParJour, conversionActive })
+    browser.storage.sync.set({ tauxHoraire, heuresParJour, conversionActive, debugMode })
       .then(() => {
         this.afficherMessage(t('settingsSaved'));
         browser.tabs.query({active: true, currentWindow: true})
@@ -223,7 +193,7 @@ class Popup {
               browser.tabs.reload(tabs[0].id);
             }
           })
-          .catch(error => console.error(t('errorReloadingPage'), error));
+          .catch(error => logDebug('Error reloading page:', error));
       })
       .catch(error => this.afficherMessage(t('errorSavingSettings'), true));
   }
@@ -330,7 +300,8 @@ class Popup {
       'websiteInfo': 'website',
       'sources': 'sources',
       'backToMain': 'back',
-      'backFromAbout': 'back'
+      'backFromAbout': 'back',
+      'debugModeLabel': 'debugMode'
     };
 
     for (const [id, key] of Object.entries(elements)) {
@@ -338,7 +309,7 @@ class Popup {
       if (element) {
         element.textContent = t(key);
       } else {
-        console.warn(`Element with id '${id}' not found`);
+        logDebug(`Element with id '${id}' not found`);
       }
     }
 
@@ -387,17 +358,17 @@ class Popup {
    * Initialise le sélecteur de langue de l'extension
    */
   initLanguage() {
-    console.log('Initializing language selector');
+    logDebug('Initializing language selector');
     const languageSelect = document.getElementById('language-select');
     const languageLabel = document.getElementById('languageLabel');
     
     if (!languageSelect || !languageLabel) {
-      console.error('Language select or label element not found');
+      logDebug('Language select or label element not found');
       return;
     }
   
     languageLabel.textContent = t('language');
-    console.log('Language label updated:', t('language'));
+    logDebug('Language label updated:', t('language'));
     
     // Vider le select avant d'ajouter les options
     languageSelect.innerHTML = '';
@@ -407,11 +378,11 @@ class Popup {
       option.value = locale;
       option.textContent = locales[currentLocale][locale] || locale;
       languageSelect.appendChild(option);
-      console.log(`Added language option: ${locale} - ${option.textContent}`);
+      logDebug(`Added language option: ${locale} - ${option.textContent}`);
     });
     
     languageSelect.value = currentLocale;
-    console.log('Current language set to:', currentLocale);
+    logDebug('Current language set to:', currentLocale);
     languageSelect.addEventListener('change', (e) => this.changeLanguage(e.target.value));
   }
 
@@ -448,5 +419,15 @@ class Popup {
       const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       this.updateUITheme();
     }
+  }
+
+  updateDebugMode() {
+    this.debugMode = this.debugModeToggle.checked;
+    setDebugMode(this.debugMode);
+    browser.storage.sync.set({ debugMode: this.debugMode })
+      .then(() => {
+        this.afficherMessage(t('debugModeChanged'));
+      })
+      .catch(error => this.afficherMessage(t('errorSavingDebugMode'), true));
   }
 }

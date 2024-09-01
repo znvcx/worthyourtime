@@ -5,15 +5,15 @@
  * @return {string} Temps formaté
  */
 export function formatTemps(heures, heuresParJour) {
-    const jours = Math.floor(heures / heuresParJour);
-    const heuresRestantes = Math.floor(heures % heuresParJour);
-    const minutes = Math.round((heures % 1) * 60);
-    
-    let resultat = '';
-    if (jours > 0) resultat += `${jours}j `;
-    if (heuresRestantes > 0 || (jours === 0 && minutes === 0)) resultat += `${heuresRestantes}h `;
-    if (minutes > 0) resultat += `${minutes}m`;
-    return resultat.trim();
+  const jours = Math.floor(heures / heuresParJour);
+  const heuresRestantes = Math.floor(heures % heuresParJour);
+  const minutes = Math.round((heures % 1) * 60);
+  
+  let resultat = '';
+  if (jours > 0) resultat += `${jours}j `;
+  if (heuresRestantes > 0 || (jours === 0 && minutes === 0)) resultat += `${heuresRestantes}h `;
+  if (minutes > 0) resultat += `${minutes}m`;
+  return resultat.trim();
 }
 
 /**
@@ -24,9 +24,30 @@ export function formatTemps(heures, heuresParJour) {
  * @return {number} Valeur validée
  */
 export function validateNumber(value, min, max) {
-    const num = parseFloat(value);
-    if (isNaN(num)) return min;
-    if (num < min) return min;
-    if (max !== undefined && num > max) return max;
-    return num;
+  const num = parseFloat(value);
+  if (isNaN(num)) return min;
+  if (num < min) return min;
+  if (max !== undefined && num > max) return max;
+  return num;
+}
+
+// Debug mode
+let debugMode = false;
+
+/**
+ * Log une information en mode debug
+ * @param {...any} args - Arguments à logguer
+ */
+export function logDebug(...args) {
+  if (debugMode) {
+    console.log("WYT: ", ...args);
+  }
+}
+
+/**
+ * Active ou désactive le mode debug
+ * @param {boolean} mode - Mode debug à activer ou désactiver
+ */
+export function setDebugMode(mode) {
+  debugMode = mode;
 }

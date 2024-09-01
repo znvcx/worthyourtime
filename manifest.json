@@ -34,7 +34,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js", "locales.js"]
+      "js": ["loader.js"]
     }
   ]
 }
