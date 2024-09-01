@@ -5,6 +5,9 @@
   let conversionActive = true;
   let tauxHoraire, heuresParJour;
   
+  /**
+   * Initialise l'extension en chargeant les options et en configurant les écouteurs d'événements
+   */
   function initialiserExtension() {
       console.log("WYT: Initialisation de l'extension");
       browser.storage.sync.get(['tauxHoraire', 'heuresParJour', 'conversionActive']).then(data => {
@@ -18,6 +21,9 @@
       });
   }
   
+  /**
+   * Met à jour les prix convertis sur la page
+   */
   function mettreAJourPrixConvertis() {
       console.log("WYT: Mise à jour des prix convertis");
       restaurerPrixOriginaux();
@@ -26,9 +32,13 @@
       }
   }
   
+  /**
+   * Remplace les prix par leur équivalent en temps de travail
+   */
   function remplacerPrix() {
     console.log("WYT: Remplacement des prix");
-    // Mise à jour de l'expression régulière pour être plus spécifique aux prix
+    
+    // Expression régulière pour détecter les prix
     const regex = /(?<!\d)(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)\s*)?(\d{1,3}(?:[ '\u00A0]\d{3})*(?:[.,]\d{1,2})?)\s*(?:([₿₽₺₩₴₦₱₭₫៛₪₨]|[A-Z]{3}|\$|€|£|¥)|\.–|\.-)?(?!\d)/g;
 
     function convertirPrix(match, deviseBefore, prix, deviseAfter) {
@@ -79,6 +89,11 @@
     remplacerPrixDansElement(document.body);
 }
   
+  /**
+   * Formate le temps en jours, heures et minutes
+   * @param {number} heures - Nombre total d'heures
+   * @return {string} Temps formaté
+   */
   function formatTemps(heures) {
         const jours = Math.floor(heures / heuresParJour);
         const heuresRestantes = Math.floor(heures % heuresParJour);
@@ -91,6 +106,9 @@
         return resultat.trim();
     }
   
+  /**
+   * Restaure les prix originaux sur la page
+   */
   function restaurerPrixOriginaux() {
       console.log("WYT: Restauration des prix originaux");
       document.querySelectorAll('[data-prix-id]').forEach(element => {
@@ -135,6 +153,10 @@ browser.runtime.onMessage.addListener((message) => {
     }
   });
   
+  /**
+   * Met à jour toutes les conversions de prix sur la page
+   * @param {boolean} conversionActive - Indique si la conversion est active
+   */
   function mettreAJourToutesLesConversions(conversionActive) {
     if (!conversionActive) {
       // Supprimer toutes les conversions affichées
@@ -159,7 +181,7 @@ browser.runtime.onMessage.addListener((message) => {
           // Sélectionner tous les éléments de prix sur la page
           const elementsPrix = document.querySelectorAll('.prix'); // Ajustez ce sélecteur selon votre structure HTML
       
-          elementsPrice.forEach(element => {
+          elementsPrix.forEach(element => {
             // Extraire le prix de l'élément
             const prixTexte = element.textContent.trim().replace(/[^\d.,]/g, '');
             const prix = parseFloat(prixTexte.replace(',', '.'));
@@ -190,6 +212,9 @@ browser.runtime.onMessage.addListener((message) => {
         });
       }
       
+      /**
+       * Supprime toutes les conversions de prix de la page
+       */
       function supprimerToutesLesConversions() {
         const conversions = document.querySelectorAll('.conversion-temps');
         conversions.forEach(element => element.remove());

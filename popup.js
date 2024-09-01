@@ -1,21 +1,33 @@
+// Importation des traductions depuis le fichier locales.js
 const locales = window.locales;
 
+// Définition de la langue par défaut
 let currentLocale = 'en'; // Anglais par défaut
 
+// Attente du chargement complet du DOM avant d'initialiser l'extension
 document.addEventListener('DOMContentLoaded', () => {
   const popup = new Popup();
   popup.init();
 });
 
+// Fonction pour définir la langue courante
 function setLocale(locale) {
   currentLocale = locale;
 }
 
+// Fonction pour obtenir la traduction d'une clé dans la langue courante
 function t(key) {
   return locales[currentLocale][key] || key;
 }
 
 // Fonctions utilitaires
+
+/**
+ * Formate le temps en jours, heures et minutes
+ * @param {number} heures - Nombre total d'heures
+ * @param {number} heuresParJour - Nombre d'heures de travail par jour
+ * @return {string} Temps formaté
+ */
 function formatTemps(heures, heuresParJour) {
   const jours = Math.floor(heures / heuresParJour);
   const heuresRestantes = Math.floor(heures % heuresParJour);
@@ -28,6 +40,14 @@ function formatTemps(heures, heuresParJour) {
   return resultat.trim();
 }
 
+/**
+ * Valide et ajuste une valeur numérique dans une plage donnée
+ * @param {string|number} value - Valeur à valider
+ * @param {number} min - Valeur minimale autorisée
+ * @param {number} max - Valeur maximale autorisée (optionnelle)
+ * @param {number} defaultValue - Valeur par défaut si la valeur est invalide
+ * @return {number} Valeur validée
+ */
 function validateNumber(value, min, max, defaultValue) {
   const num = parseFloat(value);
   if (isNaN(num)) return defaultValue !== undefined ? defaultValue : min;
@@ -36,9 +56,15 @@ function validateNumber(value, min, max, defaultValue) {
   return num;
 }
 
-// Classe principale
+/**
+ * Classe principale gérant l'interface utilisateur du popup
+ */
 class Popup {
+  /**
+   * Initialise les éléments de l'interface et charge les options
+   */
   constructor() {
+    // Initialisation des éléments de l'interface
     this.tauxHoraireInput = document.getElementById('tauxHoraire');
     this.heuresParJourInput = document.getElementById('heuresParJour');
     this.conversionActiveInput = document.getElementById('conversionActive');
@@ -54,14 +80,21 @@ class Popup {
     this.backToMainButton = document.getElementById('backToMain');
     this.openAboutButton = document.getElementById('openAbout');
     this.backFromAboutButton = document.getElementById('backFromAbout');
+
+    // Liaison des méthodes
     this.loadOptions = this.loadOptions.bind(this);
     this.updateUI = this.updateUI.bind(this);
+
+    // Chargement initial des options et configuration de l'interface
     this.loadOptions();
     this.setupEventListeners();
     this.setupSystemThemeListener();
     this.updateUI();
   }
 
+  /**
+   * Initialise l'extension
+   */
   init() {
     this.loadOptions();
     this.initLanguage();
@@ -69,6 +102,9 @@ class Popup {
     this.setupEventListeners();
   }
 
+  /**
+   * Configure les écouteurs d'événements pour les éléments de l'interface
+   */
   setupEventListeners() {
     document.getElementById('sauvegarder').addEventListener('click', () => this.saveOptions());
     document.getElementById('calculerTemps').addEventListener('click', () => this.calculerTemps());
@@ -108,24 +144,36 @@ class Popup {
     });
   }
 
+  /**
+   * Affiche le contenu principal de l'extension
+   */
   showMainContent() {
     this.mainContent.style.display = 'block';
     this.settingsContent.style.display = 'none';
     this.aboutContent.style.display = 'none';
   }
 
+  /**
+   * Affiche le contenu des paramètres de l'extension
+   */
   showSettingsContent() {
     this.mainContent.style.display = 'none';
     this.settingsContent.style.display = 'block';
     this.aboutContent.style.display = 'none';
   }
 
+  /**
+   * Affiche le contenu "À propos" de l'extension
+   */
   showAboutContent() {
     this.mainContent.style.display = 'none';
     this.settingsContent.style.display = 'none';
     this.aboutContent.style.display = 'block';
   }
 
+  /**
+   * Charge les options de l'extension depuis le stockage
+   */
   loadOptions() {
     browser.storage.sync.get({
       tauxHoraire: 20,
@@ -150,7 +198,7 @@ class Popup {
       this.useSystemTheme = data.useSystemTheme;
       
       setLocale(data.language);
-      this.updateUITheme(data.darkMode, data.useSystemTheme);
+      this.updateUITheme();
       this.updateUI();
     }).catch(error => {
       console.error('Error loading options:', error);
@@ -158,6 +206,9 @@ class Popup {
     });
   }
 
+  /**
+   * Sauvegarde les options de l'extension dans le stockage
+   */
   saveOptions() {
     const tauxHoraire = validateNumber(this.tauxHoraireInput.value, 0.01, undefined, 20);
     const heuresParJour = validateNumber(this.heuresParJourInput.value, 0.1, 24, 8);
@@ -177,6 +228,9 @@ class Popup {
       .catch(error => this.afficherMessage(t('errorSavingSettings'), true));
   }
 
+  /**
+   * Calcule le temps nécessaire pour un prix donné
+   */
   calculerTemps() {
     const prix = validateNumber(this.prixPersonnaliseInput.value, 0.01);
     const tauxHoraire = validateNumber(this.tauxHoraireInput.value, 0.01);
@@ -191,6 +245,13 @@ class Popup {
     this.resultatCalculElement.textContent = formatTemps(tempsEnHeures, heuresParJour);
   }
 
+  /**
+   * Valide et ajuste une entrée de l'interface utilisateur
+   * @param {HTMLInputElement} input - Élément d'entrée à valider
+   * @param {number} min - Valeur minimale autorisée
+   * @param {number} max - Valeur maximale autorisée (optionnelle)
+   * @param {number} defaultValue - Valeur par défaut si la valeur est invalide
+   */
   validateInput(input, min, max, defaultValue) {
     const validValue = validateNumber(input.value, min, max, defaultValue);
     if (validValue !== parseFloat(input.value)) {
@@ -199,21 +260,29 @@ class Popup {
     }
   }
 
+  /**
+   * Met à jour les préférences de thème de l'extension
+   */
   updateThemePreference() {
     const useSystemTheme = this.systemThemeCheckbox.checked;
     browser.storage.sync.set({ useSystemTheme })
       .then(() => {
-        this.updateUITheme(this.darkModeToggle.checked, useSystemTheme);
+        this.useSystemTheme = useSystemTheme;
+        this.updateUITheme();
         this.afficherMessage(t('themePreferencesSaved'));
       })
       .catch(error => this.afficherMessage(t('errorSavingTheme'), true));
   }
 
+  /**
+   * Met à jour le mode sombre de l'extension
+   */
   updateDarkMode() {
-    if (!this.systemThemeCheckbox.checked) {
+    if (!this.useSystemTheme) {
       const isDarkMode = this.darkModeToggle.checked;
       browser.storage.sync.set({ darkMode: isDarkMode })
         .then(() => {
+          this.darkMode = isDarkMode;
           this.applyTheme(isDarkMode);
           this.afficherMessage(t(isDarkMode ? 'darkModeEnabled' : 'darkModeDisabled'));
         })
@@ -221,6 +290,9 @@ class Popup {
     }
   }
 
+  /**
+   * Met à jour l'interface utilisateur de l'extension
+   */
   updateUI() {
     this.updateUIText();
     this.updateUITheme();
@@ -231,6 +303,9 @@ class Popup {
     this.conversionActiveInput.checked = this.conversionActive;
   }
 
+  /**
+   * Met à jour le texte de l'interface utilisateur
+   */
   updateUIText() {
     document.getElementById('title').textContent = t('title');
     document.getElementById('description').textContent = t('description');
@@ -259,19 +334,36 @@ class Popup {
     this.initLanguage();
   }
 
-  updateUITheme(isDarkMode, useSystemTheme) {
-    if (useSystemTheme) {
+  /**
+   * Met à jour le thème de l'interface utilisateur
+   */
+  updateUITheme() {
+    let isDarkMode = this.darkMode;
+    if (this.useSystemTheme) {
       isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
     
     document.body.classList.toggle('dark-mode', isDarkMode);
-    this.darkModeToggle.disabled = useSystemTheme;
+    this.darkModeToggle.checked = isDarkMode;
+    this.darkModeToggle.disabled = this.useSystemTheme;
+    this.systemThemeCheckbox.checked = this.useSystemTheme;
+
+    // Pas besoin de synchroniser ici, car c'est déjà fait dans updateThemePreference et updateDarkMode
   }
 
+  /**
+   * Applique le thème sombre à l'interface utilisateur
+   * @param {boolean} isDarkMode - Indique si le mode sombre doit être activé ou non
+   */
   applyTheme(isDarkMode) {
     document.body.classList.toggle('dark-mode', isDarkMode);
   }
 
+  /**
+   * Affiche un message à l'utilisateur
+   * @param {string} message - Message à afficher
+   * @param {boolean} isError - Indique si le message est une erreur ou non
+   */
   afficherMessage(message, isError = false) {
     this.messageElement.textContent = message;
     this.messageElement.classList.toggle('error', isError);
@@ -279,6 +371,9 @@ class Popup {
     setTimeout(() => this.messageElement.classList.remove('show'), 3000);
   }
 
+  /**
+   * Initialise le sélecteur de langue de l'extension
+   */
   initLanguage() {
     console.log('Initializing language selector');
     const languageSelect = document.getElementById('language-select');
@@ -305,6 +400,10 @@ class Popup {
     languageSelect.addEventListener('change', (e) => this.changeLanguage(e.target.value));
   }
 
+  /**
+   * Change la langue de l'extension
+   * @param {string} locale - Code de langue à utiliser
+   */
   changeLanguage(locale) {
     setLocale(locale);
     browser.storage.sync.set({ language: locale })
@@ -315,11 +414,24 @@ class Popup {
       .catch(error => this.afficherMessage(t('errorChangingLanguage'), true));
   }
 
+  /**
+   * Configure un écouteur pour les changements de thème système
+   */
   setupSystemThemeListener() {
     if (window.matchMedia) {
       window.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
-        this.updateUITheme();
+        this.checkSystemTheme();
       });
+    }
+  }
+
+  /**
+   * Vérifie le thème système et met à jour l'interface utilisateur en conséquence
+   */
+  checkSystemTheme() {
+    if (this.useSystemTheme) {
+      const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      this.updateUITheme();
     }
   }
 }

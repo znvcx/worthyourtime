@@ -1,3 +1,6 @@
+/**
+ * Écoute les messages envoyés par l'extension
+ */
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "convertirPrix") {
         const { prix, tauxHoraire, heuresParJour } = message;
@@ -8,6 +11,12 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Indique que la réponse sera envoyée de manière asynchrone
 });
 
+/**
+ * Formate le temps en jours, heures et minutes
+ * @param {number} heures - Nombre total d'heures
+ * @param {number} heuresParJour - Nombre d'heures de travail par jour
+ * @return {string} Temps formaté
+ */
 function formatTemps(heures, heuresParJour) {
     const jours = Math.floor(heures / heuresParJour);
     const heuresRestantes = Math.floor(heures % heuresParJour);
