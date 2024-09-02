@@ -114,6 +114,14 @@ function restaurerPrixOriginaux() {
 
 function shouldApplyConversion() {
   const currentUrl = window.location.hostname;
+  const extensionUrl = browser.runtime.getURL('');
+  
+  logDebug(`URL actuelle : ${currentUrl}`);
+  logDebug(`URL de l'extension : ${extensionUrl}`);
+
+  if (extensionUrl.includes(currentUrl)) {
+    return false;
+  }
   if (isWhitelistMode) {
     return urlList.includes(currentUrl);
   } else {

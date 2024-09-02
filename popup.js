@@ -70,6 +70,8 @@ class Popup {
     this.initLanguage();
     this.updateUI();
     this.setupEventListeners();
+    this.setupUrlListListener();
+    this.updateListModeUI(); 
     setTimeout(() => {
       if (typeof resizePopup === 'function') {
         resizePopup();
@@ -115,7 +117,7 @@ class Popup {
     });
     this.backFromAboutButton.addEventListener('click', (e) => {
       e.preventDefault();
-      this.showSettingsContent();
+      this.showMainContent();
     });
     this.debugModeToggle.addEventListener('change', () => this.updateDebugMode());
     this.aggressiveModeToggle.addEventListener('change', () => this.updateAggressiveMode());
@@ -125,7 +127,7 @@ class Popup {
     });
     document.getElementById('backFromListsManagement').addEventListener('click', (e) => {
       e.preventDefault();
-      this.showSettingsContent();
+      this.showMainContent();
     });
     this.listModeToggle.addEventListener('change', () => this.toggleListMode());
   }
@@ -238,13 +240,7 @@ class Popup {
           this.afficherMessage(t(aggressiveMode ? 'aggressiveModeEnabled' : 'aggressiveModeDisabled'));
           this.aggressiveMode = aggressiveMode;
         }
-        browser.tabs.query({active: true, currentWindow: true})
-          .then(tabs => {
-            if (tabs[0]) {
-              browser.tabs.reload(tabs[0].id);
-            }
-          })
-          .catch(error => logDebug('Error reloading page:', error));
+        this.reloadActiveTab();
       })
       .catch(error => this.afficherMessage(t('errorSavingSettings'), true));
   }
@@ -398,18 +394,17 @@ class Popup {
       'errorAddingUrlToList': 'errorAddingUrlToList',
       'addActiveUrlToWhitelist': 'addActiveUrlToWhitelist',
       'addActiveUrlToBlacklist': 'addActiveUrlToBlacklist',
-      'whitelistUrlAdded': 'whitelistUrlAdded',
-      'blacklistUrlAdded': 'blacklistUrlAdded',
-      'whitelistUrlExists': 'whitelistUrlExists',
-      'blacklistUrlExists': 'blacklistUrlExists',
       'errorGettingActiveTab': 'errorGettingActiveTab',
       'listModeLabel': 'listModeLabel',
       'addToList': 'addToList',
       'addActiveUrlToList': 'addActiveUrlToList',
       'urlAdded': 'urlAdded',
-      'urlExists': 'urlExists'
+      'urlExists': 'urlExists',
+      'clearAllUrls': 'clearAllUrls',
+      'removeUrl': 'removeUrl',
+      'urlInputPlaceholder': 'urlInputPlaceholder'
     };
-
+  
     for (const [id, key] of Object.entries(elements)) {
       const element = document.getElementById(id);
       if (element) {
@@ -418,7 +413,13 @@ class Popup {
         logDebug(`Element with id '${id}' not found`);
       }
     }
-
+  
+    // Mise à jour du placeholder de l'input pour ajouter des URLs
+    const urlInput = document.getElementById('urlInput');
+    if (urlInput) {
+      urlInput.placeholder = t('urlInputPlaceholder');
+    }
+  
     // Mise à jour du sélecteur de langue
     this.initLanguage();
   }
@@ -545,24 +546,8 @@ class Popup {
       .then(() => {
         this.aggressiveMode = aggressiveMode;
         this.afficherMessage(t(aggressiveMode ? 'aggressiveModeEnabled' : 'aggressiveModeDisabled'));
+        this.reloadActiveTab(); 
         logDebug(`Mode agressif ${aggressiveMode ? 'activé' : 'désactivé'}`);
-        browser.tabs.query({active: true, currentWindow: true})
-          .then(tabs => {
-            if (tabs[0]) {
-              browser.tabs.reload(tabs[0].id)
-                .then(() => {
-                  logDebug('Page rechargée avec succès');
-                })
-                .catch(error => {
-                  logDebug('Erreur lors du rechargement de la page:', error);
-                  this.afficherMessage(t('errorReloadingPage'), true);
-                });
-            }
-          })
-          .catch(error => {
-            logDebug('Erreur lors de la récupération des onglets actifs:', error);
-            this.afficherMessage(t('errorGettingActiveTabs'), true);
-          });
       })
       .catch(error => {
         logDebug('Erreur lors de la sauvegarde du mode agressif:', error);
@@ -588,20 +573,34 @@ class Popup {
 
   updateUrlListUI() {
     const urlListEl = document.getElementById('urlList');
-    urlListEl.innerHTML = this.urlList.map(url => `
-      <tr>
-        <td>${url}</td>
-        <td><button class="button remove-url" data-url="${url}">X</button></td>
-      </tr>
-    `).join('');
+    urlListEl.innerHTML = this.urlList.map(url => {
+      console.log('Creating remove-url button for url:', url);
+      return `
+        <tr>
+          <td>${url}</td>
+          <td><button class="button-listsManagement remove-url" data-url="${url}">${t('removeUrl')}</button></td>
+        </tr>
+      `;
+    }).join('');
   }
 
   setupUrlListListeners() {
-    document.getElementById('addToList').addEventListener('click', () => this.addToList());
-    document.getElementById('addActiveUrlToList').addEventListener('click', () => this.addActiveUrlToList());
+    document.getElementById('addToList').addEventListener('click', () => {
+      logDebug('addToList clicked');
+      this.addToList();
+    });
+    document.getElementById('addActiveUrlToList').addEventListener('click', () => {
+      logDebug('addActiveUrlToList clicked');
+      this.addActiveUrlToList();
+    });
+    document.getElementById('clearAllUrls').addEventListener('click', () => {
+      logDebug('clearAllUrls clicked');
+      this.clearAllUrls();
+    });
     
     document.addEventListener('click', (e) => {
       if (e.target.classList.contains('remove-url')) {
+        logDebug('remove-url clicked');
         this.removeFromList(e.target.dataset.url);
       }
     });
@@ -612,16 +611,27 @@ class Popup {
         this.addToList();
       }
     });
+
+    document.getElementById('listModeToggle').addEventListener('change', () => {
+      this.isWhitelistMode = !this.isWhitelistMode;
+      this.updateListModeUI();
+    });
   }
 
   toggleListMode() {
     this.isWhitelistMode = this.listModeToggle.checked;
     this.saveListMode();
     this.updateListModeUI();
+    this.reloadActiveTab();
   }
-
+  
   updateListModeUI() {
-    document.getElementById('listModeLabel').textContent = this.isWhitelistMode ? t('listModeLabel') : t('listModeLabel').replace('blanche', 'noire').replace('Whitelist', 'Blacklist');
+    const listModeDescription = document.getElementById('listModeDescription');
+    if (this.isWhitelistMode) {
+      listModeDescription.textContent = t('whitelist');
+    } else {
+      listModeDescription.textContent = t('blacklist');
+    }
   }
 
   saveListMode() {
@@ -638,6 +648,7 @@ class Popup {
       this.saveUrlList();
       input.value = '';
       this.updateUrlListUI();
+      this.reloadActiveTab();
     }
   }
 
@@ -649,6 +660,7 @@ class Popup {
           if (!this.urlList.includes(url)) {
             this.urlList.push(url);
             this.saveUrlList();
+            this.reloadActiveTab();
             this.afficherMessage(t('urlAdded'));
           } else {
             this.afficherMessage(t('urlExists'));
@@ -662,11 +674,20 @@ class Popup {
   }
 
   removeFromList(url) {
+    logDebug('removeFromList called with url:', url);
     this.urlList = this.urlList.filter(item => item !== url);
     this.saveUrlList();
+    this.reloadActiveTab();
+  }
+
+  clearAllUrls() {
+    this.urlList = [];
+    this.saveUrlList();
+    this.reloadActiveTab();
   }
 
   saveUrlList() {
+    logDebug('saveUrlList called');
     browser.storage.sync.set({ urlList: this.urlList })
       .then(() => {
         this.updateUrlListUI();
@@ -674,4 +695,24 @@ class Popup {
       })
       .catch(error => this.afficherMessage(t('errorSavingUrlLists'), true));
   }
+
+  reloadActiveTab() {
+    browser.tabs.query({active: true, currentWindow: true})
+      .then(tabs => {
+        if (tabs[0]) {
+          browser.tabs.reload(tabs[0].id);
+        }
+      })
+      .catch(error => {
+        console.error('Error reloading active tab:', error);
+      });
+  }  
+
+  resizePopup() {
+    const body = document.body;
+    const html = document.documentElement;
+    const height = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+    browser.runtime.sendMessage({ action: "resize", height: height + 20 }); // Ajout d'une marge
+  }
+  
 }

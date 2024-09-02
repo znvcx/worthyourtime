@@ -68,6 +68,7 @@ window.locales = {
       openListsManagement: "Gérer les listes",
       addActiveUrlToWhitelist: "Ajouter l'URL active à la liste blanche",
       addActiveUrlToBlacklist: "Ajouter l'URL active à la liste noire",
+      removeUrl: "Retirer l'URL",
       errorGettingActiveTab: "Erreur lors de la récupération de l'onglet actif",
       errorGettingUrlLists: "Erreur lors de la récupération des listes de liens",
       errorSavingUrlList: "Erreur lors de la sauvegarde de la liste de liens",
@@ -75,8 +76,6 @@ window.locales = {
       errorUpdatingUrlList: "Erreur lors de la mise à jour de la liste de liens",
       errorRemovingUrlFromList: "Erreur lors de la suppression de l'URL de la liste",
       errorAddingUrlToList: "Erreur lors de l'ajout de l'URL à la liste",
-      listModeLabel: "Mode de liste",
-      listModeToggle: "Activer/désactiver le mode de liste",
       urlList: "Liste d'URL",
       urlInput: "Ajouter une URL",
       addToList: "Ajouter à la liste",
@@ -92,7 +91,12 @@ window.locales = {
       errorSavingListMode: "Erreur lors de la sauvegarde du mode de liste",
       errorGettingListMode: "Erreur lors de la récupération du mode de liste",
       urlAdded: "URL ajoutée",
-      urlExists: "URL déjà dans la liste"
+      urlExists: "URL déjà dans la liste",
+      whitelistMode: "Mode liste blanche",
+      blacklistMode: "Mode liste noire",
+      listModeDescription: "Lorsqu'il est activé, l'extension ne convertira les prix que pour les URL de la liste blanche.",
+      clearAllUrls: "Effacer toutes les URLs",
+      urlInputPlaceholder: "Ajouter une URL"
     },
     en: {
       title: "Worth Your Time?",
@@ -161,8 +165,11 @@ window.locales = {
       whitelist: "Whitelist",
       blacklist: "Blacklist",
       openListsManagement: "Manage lists",
+      addToList: "Add to list",
+      addActiveUrlToList: "Add active URL to list",
       addActiveUrlToWhitelist: "Add active URL to whitelist",
       addActiveUrlToBlacklist: "Add active URL to blacklist",
+      removeUrl: "Remove URL",
       errorGettingActiveTab: "Error getting active tab",
       errorGettingUrlLists: "Error getting URL lists",
       errorSavingUrlList: "Error saving URL list",
@@ -177,6 +184,11 @@ window.locales = {
       errorSavingListMode: "Error saving list mode",
       errorGettingListMode: "Error getting list mode",
       urlAdded: "URL added",
-      urlExists: "URL already in the list"
+      urlExists: "URL already in the list",
+      whitelistMode: "Whitelist mode",
+      blacklistMode: "Blacklist mode",
+      listModeDescription: "When enabled, the extension will only convert prices for URLs in the whitelist.",
+      clearAllUrls: "Clear all URLs",
+      urlInputPlaceholder: "Add a URL"
     }
   };
