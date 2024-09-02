@@ -1,5 +1,3 @@
-import { formatTemps } from './utils.js';
-
 /**
  * Écoute les messages envoyés par l'extension
  */
@@ -11,6 +9,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ tempsFormate });
     } else if (message.action === "contentScriptReady") {
         logDebug("Content script is ready");
+        sendResponse({ status: "ready" });
     } else if (message.action === "resizePopup") {
         browser.windows.getCurrent().then((windowInfo) => {
             browser.windows.update(windowInfo.id, {

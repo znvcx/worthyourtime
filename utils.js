@@ -1,10 +1,23 @@
+// Debug mode
+let debugMode = false;
+
+/**
+ * Log une information en mode debug
+ * @param {...any} args - Arguments à logguer
+ */
+function logDebug(...args) {
+  if (debugMode) {
+    console.log("WYT: ", ...args);
+  }
+}
+
 /**
  * Formate le temps en jours, heures et minutes
  * @param {number} heures - Nombre total d'heures
  * @param {number} heuresParJour - Nombre d'heures de travail par jour
  * @return {string} Temps formaté
  */
-export function formatTemps(heures, heuresParJour) {
+function formatTemps(heures, heuresParJour) {
   const jours = Math.floor(heures / heuresParJour);
   const heuresRestantes = Math.floor(heures % heuresParJour);
   const minutes = Math.round((heures % 1) * 60);
@@ -23,7 +36,7 @@ export function formatTemps(heures, heuresParJour) {
  * @param {number} max - Valeur maximale autorisée (optionnelle)
  * @return {number} Valeur validée
  */
-export function validateNumber(value, min, max) {
+function validateNumber(value, min, max) {
   const num = parseFloat(value);
   if (isNaN(num)) return min;
   if (num < min) return min;
@@ -31,23 +44,17 @@ export function validateNumber(value, min, max) {
   return num;
 }
 
-// Debug mode
-let debugMode = false;
-
-/**
- * Log une information en mode debug
- * @param {...any} args - Arguments à logguer
- */
-export function logDebug(...args) {
-  if (debugMode) {
-    console.log("WYT: ", ...args);
-  }
-}
-
 /**
  * Active ou désactive le mode debug
  * @param {boolean} mode - Mode debug à activer ou désactiver
  */
-export function setDebugMode(mode) {
+function setDebugMode(mode) {
   debugMode = mode;
 }
+
+
+// Expose les fonctions globalement
+window.logDebug = logDebug;
+window.setDebugMode = setDebugMode;
+window.formatTemps = formatTemps;
+window.validateNumber = validateNumber;

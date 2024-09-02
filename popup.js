@@ -1,4 +1,3 @@
-import { logDebug, setDebugMode, formatTemps, validateNumber } from './utils.js';
 // Importation des traductions depuis le fichier locales.js
 const locales = window.locales;
 
@@ -36,8 +35,9 @@ class Popup {
     this.darkModeToggle = document.getElementById('darkModeToggle');
     this.debugModeToggle = document.getElementById('debugModeToggle');
     this.heuresParJourInput = document.getElementById('heuresParJour');
-    this.isWhitelistMode = true;
+    this.isBlacklistMode = true;
     this.listModeToggle = document.getElementById('listModeToggle');
+    this.listModeToggle.addEventListener('change', () => this.toggleListMode());
     this.listsManagementContent = document.getElementById('lists-management-content');
     this.mainContent = document.getElementById('main-content');
     this.messageElement = document.getElementById('message');
@@ -46,6 +46,8 @@ class Popup {
     this.prixPersonnaliseInput = document.getElementById('prixPersonnalise');
     this.resultatCalculElement = document.getElementById('resultatCalcul');
     this.settingsContent = document.getElementById('settings-content');
+    this.setupEventListeners = this.setupEventListeners.bind(this);
+    this.setupUrlListListeners = this.setupUrlListListeners.bind(this);
     this.systemThemeCheckbox = document.getElementById('systemTheme');
     this.urlList = [];
     this.tauxHoraireInput = document.getElementById('tauxHoraire');
@@ -70,7 +72,7 @@ class Popup {
     this.initLanguage();
     this.updateUI();
     this.setupEventListeners();
-    this.setupUrlListListener();
+    this.setupUrlListListeners();
     this.updateListModeUI(); 
     this.displayVersion();
   }
@@ -175,12 +177,12 @@ class Popup {
       heuresParJour: 8,
       conversionActive: true,
       darkMode: false,
-      useSystemTheme: false,
+      useSystemTheme: true,
       language: 'en',
       debugMode: false,
       aggressiveMode: false,
       urlList: [],
-      isWhitelistMode: true
+      isBlacklistMode: true
     }).then(data => {
       // Vérifiez que les éléments existent avant d'assigner les valeurs
       if (this.tauxHoraireInput) this.tauxHoraireInput.value = data.tauxHoraire;
@@ -200,14 +202,14 @@ class Popup {
       this.debugMode = data.debugMode;
       this.aggressiveMode = data.aggressiveMode;
       this.urlList = data.urlList || [];
-      this.isWhitelistMode = data.isWhitelistMode !== undefined ? data.isWhitelistMode : true;
+      this.isBlacklistMode = data.isBlacklistMode !== undefined ? data.isBlacklistMode : true;
       setLocale(data.language);
       setDebugMode(this.debugMode);
       this.updateUITheme();
       this.updateUI();
       this.updateUrlListUI();
       this.updateListModeUI();
-      this.listModeToggle.checked = this.isWhitelistMode;
+      this.listModeToggle.checked = this.isBlacklistMode;
       
     }).catch(error => {
       logDebug('Error loading options:', error);
@@ -582,12 +584,12 @@ class Popup {
    * Charge les listes d'URL à partir du stockage
    */
   loadUrlLists() {
-    browser.storage.sync.get(['urlList', 'isWhitelistMode']).then(data => {
+    browser.storage.sync.get(['urlList', 'isBlacklistMode']).then(data => {
       this.urlList = data.urlList || [];
-      this.isWhitelistMode = data.isWhitelistMode !== undefined ? data.isWhitelistMode : true;
+      this.isBlacklistMode = data.isBlacklistMode !== undefined ? data.isBlacklistMode : true;
       this.updateUrlListUI();
       this.updateListModeUI();
-      this.listModeToggle.checked = this.isWhitelistMode;
+      this.listModeToggle.checked = this.isBlacklistMode;
     });
   }
   
@@ -596,15 +598,35 @@ class Popup {
    */
   updateUrlListUI() {
     const urlListEl = document.getElementById('urlList');
-    urlListEl.innerHTML = this.urlList.map(url => {
-      console.log('Creating remove-url button for url:', url);
-      return `
-        <tr>
-          <td>${url}</td>
-          <td><button class="button-listsManagement remove-url" data-url="${url}">${t('removeUrl')}</button></td>
-        </tr>
-      `;
-    }).join('');
+    urlListEl.innerHTML = ''; // Vider la table existante
+  
+    this.urlList.forEach(url => {
+      logDebug('Creating remove-url button for url:', url);
+  
+      // Créer une nouvelle ligne de table
+      const tr = document.createElement('tr');
+  
+      // Créer la cellule pour l'URL
+      const tdUrl = document.createElement('td');
+      tdUrl.textContent = url;
+  
+      // Créer la cellule pour le bouton
+      const tdButton = document.createElement('td');
+      const button = document.createElement('button');
+      button.textContent = t('removeUrl');
+      button.classList.add('button-listsManagement', 'remove-url');
+      button.dataset.url = url;
+  
+      // Ajouter le bouton à la cellule
+      tdButton.appendChild(button);
+  
+      // Ajouter les cellules à la ligne
+      tr.appendChild(tdUrl);
+      tr.appendChild(tdButton);
+  
+      // Ajouter la ligne à la table
+      urlListEl.appendChild(tr);
+    });
   }
 
   /**
@@ -639,7 +661,7 @@ class Popup {
     });
 
     document.getElementById('listModeToggle').addEventListener('change', () => {
-      this.isWhitelistMode = !this.isWhitelistMode;
+      this.toggleListMode();
       this.updateListModeUI();
     });
   }
@@ -648,7 +670,7 @@ class Popup {
    * Bascule le mode de liste
    */
   toggleListMode() {
-    this.isWhitelistMode = this.listModeToggle.checked;
+    this.isBlacklistMode = !this.isBlacklistMode;
     this.saveListMode();
     this.updateListModeUI();
     this.reloadActiveTab();
@@ -660,21 +682,24 @@ class Popup {
   updateListModeUI() {
     const listModeLabel = document.getElementById('listModeLabel');
     const listModeDescription = document.getElementById('listModeDescription');
+    const listModeToggle = document.getElementById('listModeToggle');
 
-    if (this.isWhitelistMode) {
-      listModeLabel.textContent = t('whitelist');
-      listModeDescription.textContent = t('whitelistModeDescription');
-    } else {
+    if (this.isBlacklistMode) {
       listModeLabel.textContent = t('blacklist');
       listModeDescription.textContent = t('blacklistModeDescription');
+    } else {
+      listModeLabel.textContent = t('whitelist');
+      listModeDescription.textContent = t('whitelistModeDescription');
     }
+
+    listModeToggle.checked = this.isBlacklistMode;
   }
 
   /**
    * Sauvegarde le mode de liste
    */
   saveListMode() {
-    browser.storage.sync.set({ isWhitelistMode: this.isWhitelistMode })
+    browser.storage.sync.set({ isBlacklistMode: this.isBlacklistMode })
       .then(() => this.afficherMessage(t('settingsSaved')))
       .catch(error => this.afficherMessage(t('errorSavingSettings'), true));
   }

@@ -25,17 +25,20 @@
     "tabs"
   ],
   "web_accessible_resources": [
-    "styles.css"
+    "utils.js",
+    "locales.js",
+    "content.js",
+    "popup.js",
+    "background.js"
   ],
   "background": {
-    "scripts": ["loader.js"],
-    "type": "module",
+    "scripts": ["utils.js", "background.js"],
     "persistent": false
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["loader.js"]
+      "js": ["utils.js", "content.js"]
     }
   ]
 }

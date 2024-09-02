@@ -1,24 +1,26 @@
-import { logDebug, setDebugMode, formatTemps, validateNumber } from './utils.js';
-
 logDebug("Script de contenu chargé");
 
 // Informer le background script que le content script est prêt
-browser.runtime.sendMessage({ action: "contentScriptReady" });
+browser.runtime.sendMessage({ action: "contentScriptReady" }).then(response => {
+        logDebug("Informé background script que content script est prêt :", response.status);
+    })
+    .catch(error => {
+        logDebug("Erreur lors de l'information au background script que content script est prêt :", error);
+    });
 
 let prixOriginaux = new Map();
 let conversionActive = true;
 let tauxHoraire, heuresParJour;
-let debugMode = false;
 let aggressiveMode = false;
 let urlList = [];
-let isWhitelistMode = true;
+let isBlacklistMode = true;
 
 /**
  * Initialise l'extension en chargeant les options et en configurant les écouteurs d'événements
  */
 function initialiserExtension() {
     logDebug("Initialisation de l'extension");
-    browser.storage.sync.get(['tauxHoraire', 'heuresParJour', 'conversionActive', 'debugMode', 'aggressiveMode', 'urlList', 'isWhitelistMode']).then(data => {
+    browser.storage.sync.get(['tauxHoraire', 'heuresParJour', 'conversionActive', 'debugMode', 'aggressiveMode', 'urlList', 'isBlacklistMode']).then(data => {
         logDebug("Données récupérées", data);
         conversionActive = data.conversionActive !== undefined ? data.conversionActive : true;
         tauxHoraire = data.tauxHoraire || 20;
@@ -26,7 +28,7 @@ function initialiserExtension() {
         debugMode = data.debugMode || false;
         aggressiveMode = data.aggressiveMode || false;
         urlList = data.urlList || [];
-        isWhitelistMode = data.isWhitelistMode !== undefined ? data.isWhitelistMode : true;
+        isBlacklistMode = data.isBlacklistMode !== undefined ? data.isBlacklistMode : true;
         setDebugMode(debugMode);
         logDebug(`Mode agressif : ${aggressiveMode ? 'activé' : 'désactivé'}`);
         if (shouldApplyConversion()) {
@@ -61,6 +63,7 @@ function remplacerPrix() {
     logDebug(`Mode utilisé pour la regex : ${aggressiveMode ? 'agressif' : 'doux'}`);
 
     function convertirPrix(match, deviseAvant, prixAvecDeviseAvant, prixSansDevise, deviseApres) {
+        logDebug(`Match trouvé : ${match}`);
         const prix = prixAvecDeviseAvant || prixSansDevise;
         if (!prix) {
             logDebug("Prix non trouvé dans le match:", match);
@@ -69,6 +72,7 @@ function remplacerPrix() {
         const prixNumerique = parseFloat(prix.replace(/[^\d.,]/g, '').replace(',', '.'));
         const tempsEnHeures = prixNumerique / tauxHoraire;
         const tempsFormate = formatTemps(tempsEnHeures, heuresParJour);
+        logDebug(`Conversion : ${prixNumerique} -> ${tempsFormate}`);
         return `${tempsFormate} (${match})`;
     }
 
@@ -78,6 +82,7 @@ function remplacerPrix() {
             const nouveauTexte = texteOriginal.replace(regex, convertirPrix);
             if (texteOriginal !== nouveauTexte) {
                 element.textContent = nouveauTexte;
+                logDebug(`Texte remplacé : "${texteOriginal}" -> "${nouveauTexte}"`);
             }
         } else if (element.nodeType === Node.ELEMENT_NODE) {
             if (element.tagName !== 'SCRIPT' && element.tagName !== 'STYLE') {
@@ -87,6 +92,7 @@ function remplacerPrix() {
     }
 
     remplacerPrixDansElement(document.body);
+    logDebug("Conversions des prix terminées");
 }
 
 /**
@@ -115,101 +121,114 @@ function restaurerPrixOriginaux() {
 function shouldApplyConversion() {
   const currentUrl = window.location.hostname;
   const extensionUrl = browser.runtime.getURL('');
-  
+
   logDebug(`URL actuelle : ${currentUrl}`);
   logDebug(`URL de l'extension : ${extensionUrl}`);
+  logDebug(`isBlacklistMode : ${isBlacklistMode}`);
+  logDebug(`urlList : ${JSON.stringify(urlList)}`);
 
+  // pas de conversion sur la page de l'extension
   if (extensionUrl.includes(currentUrl)) {
+    logDebug("URL de l'extension, pas de conversion");
     return false;
   }
-  if (isWhitelistMode) {
-    return urlList.includes(currentUrl);
+
+  if (isBlacklistMode) {
+    // si en mode blacklist, on ne convertit pas les prix des urls blacklistées
+    const shouldApply = !urlList.includes(currentUrl);
+    logDebug(`Mode liste noire, conversion : ${shouldApply}`);
+    return shouldApply;
   } else {
-    return !urlList.includes(currentUrl);
+    // si mode whitelist, on convertit les prix des urls whitelistées
+    const shouldApply = urlList.includes(currentUrl);
+    logDebug(`Mode liste blanche, conversion : ${shouldApply}`);
+    return shouldApply;
   }
 }
 
 // Initialiser l'extension 
 initialiserExtension();
 
+// écouter les messages du background pour appliquer les changements
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     logDebug("Message reçu", message);
     if (message.action === "appliquerChangements") {
-        browser.storage.sync.get(['tauxHoraire', 'heuresParJour', 'conversionActive', 'debugMode']).then(data => {
-            logDebug("Nouvelles données reçues", data);
-            conversionActive = data.conversionActive;
-            tauxHoraire = data.tauxHoraire;
-            heuresParJour = data.heuresParJour;
-            debugMode = data.debugMode;
-            aggressiveMode = data.aggressiveMode;
-            setDebugMode(debugMode);
-            logDebug(`Mode agressif : ${aggressiveMode ? 'activé' : 'désactivé'}`);
-            mettreAJourPrixConvertis();
-        });
-    } else if (message.action === "updateAggressiveMode") {
-        aggressiveMode = message.aggressiveMode;
-        logDebug(`Mode agressif mis à jour : ${aggressiveMode ? 'activé' : 'désactivé'}`);
-        mettreAJourPrixConvertis();
+      browser.storage.sync.get(['tauxHoraire', 'heuresParJour', 'conversionActive', 'debugMode', 'aggressiveMode', 'urlList', 'isBlacklistMode']).then(data => {
+        logDebug("Nouvelles données reçues", data);
+        conversionActive = data.conversionActive;
+        tauxHoraire = data.tauxHoraire;
+        heuresParJour = data.heuresParJour;
+        debugMode = data.debugMode;
+        aggressiveMode = data.aggressiveMode;
+        urlList = data.urlList || [];
+        isBlacklistMode = data.isBlacklistMode;
+        setDebugMode(debugMode);
+        logDebug(`Mode agressif : ${aggressiveMode ? 'activé' : 'désactivé'}`);
+        if (shouldApplyConversion() && conversionActive) {
+          mettreAJourPrixConvertis();
+        } else {
+          restaurerPrixOriginaux();
+        }
+      });
     }
-});
-
+  });
 
 /**
  * Met à jour toutes les conversions de prix sur la page
- * @param {boolean} conversionActive - Indique si la conversion est active
  */
-function mettreAJourToutesLesConversions(conversionActive) {
-  if (!conversionActive) {
-      // Supprimer toutes les conversions affichées
-      supprimerToutesLesConversions();
-      return;
-  }
-
-  // Logique pour mettre à jour ou afficher les conversions
-  // Cela dépendra de la façon dont vous avez implémenté les conversions initialement
-  browser.storage.sync.get(['tauxHoraire', 'heuresParJour', 'conversionActive']).then(options => {
+function mettreAJourToutesLesConversions() {
+    logDebug("Mise à jour de toutes les conversions");
+  
+    browser.storage.sync.get(['tauxHoraire', 'heuresParJour', 'conversionActive']).then(options => {
       if (!options.conversionActive) {
-          // Si la conversion n'est pas active, supprimer toutes les conversions existantes
-          supprimerToutesLesConversions();
-          return;
+        logDebug("La conversion n'est pas active, suppression des conversions existantes");
+        supprimerToutesLesConversions();
+        return;
       }
   
       const tauxHoraire = options.tauxHoraire;
       const heuresParJour = options.heuresParJour;
   
-      // Sélectionner tous les éléments de prix sur la page
+      logDebug(`Taux horaire : ${tauxHoraire}, Heures par jour : ${heuresParJour}`);
+  
+      // Logique pour mettre à jour ou afficher les conversions
       const elementsPrix = document.querySelectorAll('.prix'); // Ajustez ce sélecteur selon votre structure HTML
+      logDebug(`Nombre d'éléments de prix trouvés : ${elementsPrix.length}`);
   
       elementsPrix.forEach(element => {
-          // Extraire le prix de l'élément
-          const prixTexte = element.textContent.trim().replace(/[^\d.,]/g, '');
-          const prix = parseFloat(prixTexte.replace(',', '.'));
+        // Extraire le prix de l'élément
+        const prixTexte = element.textContent.trim().replace(/[^\d.,]/g, '');
+        const prix = parseFloat(prixTexte.replace(',', '.'));
   
-          if (!isNaN(prix)) {
-              // Calculer le temps équivalent
-              const heuresTravail = prix / tauxHoraire;
-              const joursTravail = heuresTravail / heuresParJour;
+        if (!isNaN(prix)) {
+          // Calculer le temps équivalent
+          const heuresTravail = prix / tauxHoraire;
+          const joursTravail = heuresTravail / heuresParJour;
   
-              // Formater le résultat
-              let tempsEquivalent = '';
-              if (joursTravail >= 1) {
-                  tempsEquivalent = `${joursTravail.toFixed(1)} jours`;
-              } else {
-                  tempsEquivalent = `${heuresTravail.toFixed(1)} heures`;
-              }
-  
-              // Mettre à jour ou créer l'élément de conversion
-              let conversionElement = element.nextElementSibling;
-              if (!conversionElement || !conversionElement.classList.contains('conversion-temps')) {
-                  conversionElement = document.createElement('span');
-                  conversionElement.classList.add('conversion-temps');
-                  element.parentNode.insertBefore(conversionElement, element.nextSibling);
-              }
-              conversionElement.textContent = `(${tempsEquivalent})`;
+          // Formater le résultat
+          let tempsEquivalent = '';
+          if (joursTravail >= 1) {
+            tempsEquivalent = `${joursTravail.toFixed(1)} jours`;
+          } else {
+            tempsEquivalent = `${heuresTravail.toFixed(1)} heures`;
           }
+  
+          logDebug(`Prix converti : ${prix} -> ${tempsEquivalent}`);
+  
+          // Mettre à jour ou créer l'élément de conversion
+          let conversionElement = element.nextElementSibling;
+          if (!conversionElement || !conversionElement.classList.contains('conversion-temps')) {
+            conversionElement = document.createElement('span');
+            conversionElement.classList.add('conversion-temps');
+            element.parentNode.insertBefore(conversionElement, element.nextSibling);
+          }
+          conversionElement.textContent = `(${tempsEquivalent})`;
+        }
       });
-  });
-}
+    }).catch(error => {
+      console.error("Erreur lors de la récupération des options pour la conversion :", error);
+    });
+  }
 
 /**
 * Supprime toutes les conversions de prix de la page
@@ -225,6 +244,6 @@ mettreAJourToutesLesConversions();
 // Écouter les messages pour les mises à jour futures
 browser.runtime.onMessage.addListener((message) => {
   if (message.action === "mettreAJourConversions") {
-      mettreAJourToutesLesConversions(message.conversionActive);
+      mettreAJourToutesLesConversions();
   }
 });
