@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.2.3] - 2023-10-01
+## [1.2.3] - 2023-09-02
 ### Added
 - Added support for whitelist and blacklist modes.
 - Added `displayVersion` method to display the extension version in the popup.
@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed issue with version number not displaying correctly in `popup.html`.
 - Fixed issue with `remove-url` button not working correctly in `updateUrlListUI`.
 
-## [1.2.2] - 2023-09-15
+## [1.2.2] - 2023-09-01
 ### Added
 - Initial release with basic functionality.
 - Added support for dark mode and system theme preference.
