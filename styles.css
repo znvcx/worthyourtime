@@ -3,7 +3,10 @@
     --secondary-color: #f5a623;
     --text-color: #333;
     --background-color: #f9f9f9;
-    --input-background: #ffffff;
+    --background-color-darker: #f6f6f6;
+    --background-color-lighter: #fcfcfc;
+    --background-color-hover: #f2f2f2;
+    --input-background: #f6f6f6;
     --border-color: #e0e0e0;
     --text-color-onColoredBg: #ffffff;
 }
@@ -11,8 +14,11 @@
 body.dark-mode {
     --text-color: #ffffff;
     --background-color: #2c3e50;
-    --input-background: #34495e;
-    --border-color: #7f8c8d;
+    --background-color-darker: #3d4f63;
+    --background-color-lighter: #4c6279;
+    --background-color-hover: #416080;
+    --input-background: #4c6279;
+    --border-color: rgb(46, 60, 77);
     --primary-color: #5a9cf2; /* Version plus claire pour le mode sombre */
 }
 
@@ -339,3 +345,63 @@ select {
 .button-listsManagement:hover {
     color: var(--secondary-color);
 }
+
+#urlListTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  #urlListTable th, #urlListTable td {
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    text-align: left;
+  }
+  
+  #urlListTable th {
+    background-color: var(--primary-color);
+    color: var(--text-color-onColoredBg);
+    font-weight: bold;
+  }
+  
+  #urlListTable tr:nth-child(even) {
+    background-color: var(--background-color-darker);
+  }
+  
+  #urlListTable tr:nth-child(odd) {
+    background-color: var(--background-color-lighter);
+  }
+  
+  #urlListTable tr:hover {
+    background-color: var(--background-color-hover);
+    color: var(--text-color);
+  }
+  
+  #urlListTable td {
+    overflow: hidden;
+    word-break: break-all;
+    max-width: 200px;
+    white-space: normal; 
+  }
+  
+  #urlListTable .button-listsManagement {
+    background-color: var(--primary-color);
+    color: var(--text-color-onColoredBg);
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  #urlListTable .button-listsManagement:hover {
+    background-color: var(--secondary-color);
+  }
+
+  .list-mode-description {
+    font-size: 12px;
+    color: var(--text-color);
+    margin-top: 5px;
+    margin-bottom: 15px;
+    opacity: 0.7;
+  }

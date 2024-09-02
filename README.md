@@ -10,6 +10,7 @@
 - Dark mode and system theme support
 - Intuitive and responsive user interface
 - Debug mode to display debugging information in the console
+- Whitelist and blacklist modes for URL management
 
 ## Installation
 **Recommended:**
@@ -37,6 +38,8 @@ You can customize the following settings:
 - Theme (light, dark, or follow system theme)
 - Aggressive mode: Choose between aggressive mode (converts more prices but may affect page layout) and gentle mode (more conservative, preserves visual integrity of websites)
 - Debug mode: Enable or disable debug mode to display debugging information in the console
+- Whitelist mode: Convert prices only on URLs in the whitelist
+- Blacklist mode: Convert prices on all URLs except those in the blacklist
 
 ## Debug Mode
 Debug mode allows you to display debugging information in the browser console. This can be useful for diagnosing issues or understanding the internal workings of the extension.
@@ -61,6 +64,20 @@ Aggressive mode allows you to choose between two price conversion strategies:
 4. The changes will be applied immediately to the current page and all future pages.
 
 Choose the mode that best suits your needs and browsing experience.
+
+## Whitelist and Blacklist Modes
+Whitelist and blacklist modes allow you to control on which URLs the price conversion should occur.
+
+### Whitelist Mode
+In whitelist mode, the extension will only convert prices on the URLs listed in the whitelist.
+
+### Blacklist Mode
+In blacklist mode, the extension will convert prices on all URLs except those listed in the blacklist.
+
+### Manage Whitelist and Blacklist
+1. Open the extension popup by clicking on the extension icon in the browser toolbar.
+2. Go to the lists management by clicking on the lists management icon.
+3. Add or remove URLs from the whitelist or blacklist as needed.
 
 ## Project Structure
 <pre>

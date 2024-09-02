@@ -28,27 +28,27 @@ class Popup {
    */
   constructor() {
     // Initialisation des éléments de l'interface
-    this.tauxHoraireInput = document.getElementById('tauxHoraire');
-    this.heuresParJourInput = document.getElementById('heuresParJour');
-    this.conversionActiveInput = document.getElementById('conversionActive');
-    this.prixPersonnaliseInput = document.getElementById('prixPersonnalise');
-    this.resultatCalculElement = document.getElementById('resultatCalcul');
-    this.darkModeToggle = document.getElementById('darkModeToggle');
-    this.systemThemeCheckbox = document.getElementById('systemTheme');
-    this.messageElement = document.getElementById('message');
-    this.mainContent = document.getElementById('main-content');
-    this.settingsContent = document.getElementById('settings-content');
     this.aboutContent = document.getElementById('about-content');
-    this.openSettingsButton = document.getElementById('openSettings');
-    this.backToMainButton = document.getElementById('backToMain');
-    this.openAboutButton = document.getElementById('openAbout');
-    this.backFromAboutButton = document.getElementById('backFromAbout');
-    this.debugModeToggle = document.getElementById('debugModeToggle');
     this.aggressiveModeToggle = document.getElementById('aggressiveModeToggle');
-    this.listsManagementContent = document.getElementById('lists-management-content');
-    this.urlList = [];
+    this.backFromAboutButton = document.getElementById('backFromAbout');
+    this.backToMainButton = document.getElementById('backToMain');
+    this.conversionActiveInput = document.getElementById('conversionActive');
+    this.darkModeToggle = document.getElementById('darkModeToggle');
+    this.debugModeToggle = document.getElementById('debugModeToggle');
+    this.heuresParJourInput = document.getElementById('heuresParJour');
     this.isWhitelistMode = true;
     this.listModeToggle = document.getElementById('listModeToggle');
+    this.listsManagementContent = document.getElementById('lists-management-content');
+    this.mainContent = document.getElementById('main-content');
+    this.messageElement = document.getElementById('message');
+    this.openAboutButton = document.getElementById('openAbout');
+    this.openSettingsButton = document.getElementById('openSettings');
+    this.prixPersonnaliseInput = document.getElementById('prixPersonnalise');
+    this.resultatCalculElement = document.getElementById('resultatCalcul');
+    this.settingsContent = document.getElementById('settings-content');
+    this.systemThemeCheckbox = document.getElementById('systemTheme');
+    this.urlList = [];
+    this.tauxHoraireInput = document.getElementById('tauxHoraire');
 
     // Liaison des méthodes
     this.loadOptions = this.loadOptions.bind(this);
@@ -72,11 +72,7 @@ class Popup {
     this.setupEventListeners();
     this.setupUrlListListener();
     this.updateListModeUI(); 
-    setTimeout(() => {
-      if (typeof resizePopup === 'function') {
-        resizePopup();
-      }
-    }, 100);
+    this.displayVersion();
   }
 
   /**
@@ -326,83 +322,83 @@ class Popup {
    */
   updateUIText() {
     const elements = {
-      'title': 'title',
-      'description': 'description',
-      'hourlyRateLabel': 'hourlyRate',
-      'hoursPerDayLabel': 'hoursPerDay',
-      'conversionActiveLabel': 'conversionActive',
-      'sauvegarder': 'save',
-      'customCalculationTitle': 'customCalculation',
-      'prixPersonnalise': 'price',
-      'calculerTemps': 'calculateWorkTime',
-      'openSettings': 'settings',
-      'settingsTitle': 'settings',
-      'followSystemThemeLabel': 'followSystemTheme',
-      'darkModeLabel': 'darkMode',
-      'backToMain': 'back',
-      'openAbout': 'about',
-      'aboutTitle': 'about',
       'aboutDescription': 'aboutDescription',
-      'versionInfo': 'version',
-      'developerInfo': 'developedBy',
-      'websiteInfo': 'website',
-      'sources': 'sources',
-      'backFromAbout': 'back',
-      'debugModeLabel': 'debugMode',
-      'aggressiveModeLabel': 'aggressiveMode',
-      'whitelistTitle': 'whitelistTitle',
-      'blacklistTitle': 'blacklistTitle',
-      'addToWhitelist': 'addToWhitelist',
+      'aboutTitle': 'about',
+      'addActiveUrlToBlacklist': 'addActiveUrlToBlacklist',
+      'addActiveUrlToList': 'addActiveUrlToList',
+      'addActiveUrlToWhitelist': 'addActiveUrlToWhitelist',
       'addToBlacklist': 'addToBlacklist',
-      'whitelistInputPlaceholder': 'whitelistInputPlaceholder',
-      'blacklistInputPlaceholder': 'blacklistInputPlaceholder',
-      'listsManagementTitle': 'listsManagementTitle',
-      'backFromListsManagement': 'backFromListsManagement',
-      'whitelist': 'whitelist',
-      'blacklist': 'blacklist',
-      'openListsManagement': 'openListsManagement',
-      'versionLabel': 'version',
-      'developedByLabel': 'developedBy',
-      'websiteLabel': 'website',
-      'sourcesLabel': 'sources',
-      'settingsSaved': 'settingsSaved',
-      'errorLoadingOptions': 'errorLoadingOptions',
-      'errorSavingSettings': 'errorSavingSettings',
-      'errorReloadingPage': 'errorReloadingPage',
-      'errorSavingTheme': 'errorSavingTheme',
-      'themePreferencesSaved': 'themePreferencesSaved',
-      'errorSavingDarkMode': 'errorSavingDarkMode',
-      'darkModeDisabled': 'darkModeDisabled', 
-      'darkModeEnabled': 'darkModeEnabled',
-      'errorSavingDebugMode': 'errorSavingDebugMode',
-      'debugModeChanged': 'debugModeChanged',
-      'errorSavingAggressiveMode': 'errorSavingAggressiveMode',
+      'addToList': 'addToList',
+      'addToWhitelist': 'addToWhitelist',
       'aggressiveModeDisabled': 'aggressiveModeDisabled',
       'aggressiveModeEnabled': 'aggressiveModeEnabled',
-      'errorGettingActiveTabs': 'errorGettingActiveTabs',
-      'urlListsUpdated': 'urlListsUpdated', 
-      'errorSavingUrlLists': 'errorSavingUrlLists',
-      'errorLoadingUrlLists': 'errorLoadingUrlLists',
-      'errorUpdatingUrlLists': 'errorUpdatingUrlLists',
-      'errorRemovingUrlFromLists': 'errorRemovingUrlFromLists',
-      'errorAddingUrlToLists': 'errorAddingUrlToLists',
-      'errorGettingUrlLists': 'errorGettingUrlLists',
-      'errorSavingUrlList': 'errorSavingUrlList',
-      'errorLoadingUrlList': 'errorLoadingUrlList',
-      'errorUpdatingUrlList': 'errorUpdatingUrlList',
-      'errorRemovingUrlFromList': 'errorRemovingUrlFromList',
+      'aggressiveModeLabel': 'aggressiveMode',
+      'backFromAbout': 'back',
+      'backFromListsManagement': 'backFromListsManagement',
+      'backToMain': 'back',
+      'blacklist': 'blacklist',
+      'blacklistInputPlaceholder': 'blacklistInputPlaceholder',
+      'blacklistTitle': 'blacklistTitle',
+      'calculerTemps': 'calculateWorkTime',
+      'clearAllUrls': 'clearAllUrls',
+      'conversionActiveLabel': 'conversionActive',
+      'customCalculationTitle': 'customCalculation',
+      'darkModeDisabled': 'darkModeDisabled', 
+      'darkModeEnabled': 'darkModeEnabled',
+      'darkModeLabel': 'darkMode',
+      'debugModeChanged': 'debugModeChanged',
+      'debugModeLabel': 'debugMode',
+      'description': 'description',
+      'developedByLabel': 'developedBy',
+      'developerInfo': 'developedBy',
       'errorAddingUrlToList': 'errorAddingUrlToList',
-      'addActiveUrlToWhitelist': 'addActiveUrlToWhitelist',
-      'addActiveUrlToBlacklist': 'addActiveUrlToBlacklist',
+      'errorAddingUrlToLists': 'errorAddingUrlToLists',
       'errorGettingActiveTab': 'errorGettingActiveTab',
+      'errorGettingActiveTabs': 'errorGettingActiveTabs',
+      'errorGettingUrlLists': 'errorGettingUrlLists',
+      'errorLoadingOptions': 'errorLoadingOptions',
+      'errorLoadingUrlList': 'errorLoadingUrlList',
+      'errorLoadingUrlLists': 'errorLoadingUrlLists',
+      'errorReloadingPage': 'errorReloadingPage',
+      'errorRemovingUrlFromList': 'errorRemovingUrlFromList',
+      'errorRemovingUrlFromLists': 'errorRemovingUrlFromLists',
+      'errorSavingAggressiveMode': 'errorSavingAggressiveMode',
+      'errorSavingDarkMode': 'errorSavingDarkMode',
+      'errorSavingDebugMode': 'errorSavingDebugMode',
+      'errorSavingSettings': 'errorSavingSettings',
+      'errorSavingTheme': 'errorSavingTheme',
+      'errorSavingUrlList': 'errorSavingUrlList',
+      'errorSavingUrlLists': 'errorSavingUrlLists',
+      'errorUpdatingUrlList': 'errorUpdatingUrlList',
+      'errorUpdatingUrlLists': 'errorUpdatingUrlLists',
+      'followSystemThemeLabel': 'followSystemTheme',
+      'hourlyRateLabel': 'hourlyRate',
+      'hoursPerDayLabel': 'hoursPerDay',
       'listModeLabel': 'listModeLabel',
-      'addToList': 'addToList',
-      'addActiveUrlToList': 'addActiveUrlToList',
+      'listsManagementTitle': 'listsManagementTitle',
+      'openAbout': 'about',
+      'openListsManagement': 'openListsManagement',
+      'openSettings': 'settings',
+      'prixPersonnalise': 'price',
+      'removeUrl': 'removeUrl',
+      'sauvegarder': 'save',
+      'settingsSaved': 'settingsSaved',
+      'settingsTitle': 'settings',
+      'sources': 'sources',
+      'sourcesLabel': 'sources',
+      'themePreferencesSaved': 'themePreferencesSaved',
+      'title': 'title',
       'urlAdded': 'urlAdded',
       'urlExists': 'urlExists',
-      'clearAllUrls': 'clearAllUrls',
-      'removeUrl': 'removeUrl',
-      'urlInputPlaceholder': 'urlInputPlaceholder'
+      'urlInputPlaceholder': 'urlInputPlaceholder',
+      'urlListsUpdated': 'urlListsUpdated', 
+      'versionInfo': 'version',
+      'versionLabel': 'version',
+      'websiteInfo': 'website',
+      'websiteLabel': 'website',
+      'whitelist': 'whitelist',
+      'whitelistInputPlaceholder': 'whitelistInputPlaceholder',
+      'whitelistTitle': 'whitelistTitle'
     };
   
     for (const [id, key] of Object.entries(elements)) {
@@ -420,8 +416,20 @@ class Popup {
       urlInput.placeholder = t('urlInputPlaceholder');
     }
   
+    // Mise à jour du label du switch pour le mode de liste
+    const listModeLabel = document.getElementById('listModeLabel');
+    if (listModeLabel) {
+      listModeLabel.textContent = t('listModeLabel');
+    }
+  
+    // Mise à jour de la description du mode de liste
+    this.updateListModeUI();
+  
     // Mise à jour du sélecteur de langue
     this.initLanguage();
+
+    // Mise à jour de la version
+    this.displayVersion();
   }
 
   /**
@@ -528,6 +536,9 @@ class Popup {
     }
   }
 
+  /**
+   * Met à jour le mode de débogage de l'extension
+   */
   updateDebugMode() {
     this.debugMode = this.debugModeToggle.checked;
     setDebugMode(this.debugMode);
@@ -538,6 +549,9 @@ class Popup {
       .catch(error => this.afficherMessage(t('errorSavingDebugMode'), true));
   }
 
+  /**
+   * Met à jour le mode agressif de l'extension
+   */
   updateAggressiveMode() {
     const aggressiveMode = this.aggressiveModeToggle.checked;
     
@@ -555,12 +569,18 @@ class Popup {
       });
   }
 
+  /**
+   * Initialise les listes d'URL
+   */
   initUrlLists() {
     this.urlList = [];
     this.loadUrlLists();
     this.setupUrlListListeners();
   }
 
+  /**
+   * Charge les listes d'URL à partir du stockage
+   */
   loadUrlLists() {
     browser.storage.sync.get(['urlList', 'isWhitelistMode']).then(data => {
       this.urlList = data.urlList || [];
@@ -570,7 +590,10 @@ class Popup {
       this.listModeToggle.checked = this.isWhitelistMode;
     });
   }
-
+  
+  /**
+   * Met à jour l'interface utilisateur de la liste des URLs
+   */
   updateUrlListUI() {
     const urlListEl = document.getElementById('urlList');
     urlListEl.innerHTML = this.urlList.map(url => {
@@ -584,6 +607,9 @@ class Popup {
     }).join('');
   }
 
+  /**
+   * Configure les écouteurs d'événements pour la gestion des listes d'URL
+   */
   setupUrlListListeners() {
     document.getElementById('addToList').addEventListener('click', () => {
       logDebug('addToList clicked');
@@ -617,7 +643,10 @@ class Popup {
       this.updateListModeUI();
     });
   }
-
+  
+  /**
+   * Bascule le mode de liste
+   */
   toggleListMode() {
     this.isWhitelistMode = this.listModeToggle.checked;
     this.saveListMode();
@@ -625,33 +654,52 @@ class Popup {
     this.reloadActiveTab();
   }
   
+  /**
+   * Met à jour l'interface utilisateur du mode de liste
+   */
   updateListModeUI() {
+    const listModeLabel = document.getElementById('listModeLabel');
     const listModeDescription = document.getElementById('listModeDescription');
+
     if (this.isWhitelistMode) {
-      listModeDescription.textContent = t('whitelist');
+      listModeLabel.textContent = t('whitelist');
+      listModeDescription.textContent = t('whitelistModeDescription');
     } else {
-      listModeDescription.textContent = t('blacklist');
+      listModeLabel.textContent = t('blacklist');
+      listModeDescription.textContent = t('blacklistModeDescription');
     }
   }
 
+  /**
+   * Sauvegarde le mode de liste
+   */
   saveListMode() {
     browser.storage.sync.set({ isWhitelistMode: this.isWhitelistMode })
       .then(() => this.afficherMessage(t('settingsSaved')))
       .catch(error => this.afficherMessage(t('errorSavingSettings'), true));
   }
 
+  /**
+   * Ajoute une URL à la liste
+   */
   addToList() {
     const input = document.getElementById('urlInput');
     const url = input.value.trim();
-    if (url && !this.urlList.includes(url)) {
-      this.urlList.push(url);
+    const cleanedUrl = this.validateAndCleanUrl(url);
+    if (cleanedUrl && !this.urlList.includes(cleanedUrl)) {
+      this.urlList.push(cleanedUrl);
       this.saveUrlList();
       input.value = '';
       this.updateUrlListUI();
       this.reloadActiveTab();
+    } else {
+      this.afficherMessage(t('invalidUrl'), true);
     }
   }
 
+  /**
+   * Ajoute l'URL de l'onglet actif à la liste
+   */
   addActiveUrlToList() {
     browser.tabs.query({active: true, currentWindow: true})
       .then(tabs => {
@@ -673,6 +721,10 @@ class Popup {
       });
   }
 
+  /**
+   * Supprime une URL de la liste
+   * @param {string} url - L'URL à supprimer
+   */
   removeFromList(url) {
     logDebug('removeFromList called with url:', url);
     this.urlList = this.urlList.filter(item => item !== url);
@@ -680,12 +732,18 @@ class Popup {
     this.reloadActiveTab();
   }
 
+  /**
+   * Efface toutes les URLs de la liste
+   */
   clearAllUrls() {
     this.urlList = [];
     this.saveUrlList();
     this.reloadActiveTab();
   }
 
+  /**
+   * Sauvegarde la liste des URLs
+   */
   saveUrlList() {
     logDebug('saveUrlList called');
     browser.storage.sync.set({ urlList: this.urlList })
@@ -696,6 +754,9 @@ class Popup {
       .catch(error => this.afficherMessage(t('errorSavingUrlLists'), true));
   }
 
+  /**
+   * Recharge l'onglet active
+   */
   reloadActiveTab() {
     browser.tabs.query({active: true, currentWindow: true})
       .then(tabs => {
@@ -708,11 +769,33 @@ class Popup {
       });
   }  
 
-  resizePopup() {
-    const body = document.body;
-    const html = document.documentElement;
-    const height = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
-    browser.runtime.sendMessage({ action: "resize", height: height + 20 }); // Ajout d'une marge
+  /**
+   * Valide et nettoie une URL
+   * @param {string} url - L'URL à valider et nettoyer
+   * @returns {string|null} - L'URL nettoyée si valide, sinon null
+   */
+  validateAndCleanUrl(url) {
+    // Expression régulière pour valider l'URL
+    const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+    if (urlPattern.test(url)) {
+      // Nettoyer l'URL pour éviter les risques de sécurité
+      const cleanedUrl = url.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return cleanedUrl;
+    }
+    return null;
+  }
+
+  displayVersion() {
+    const versionElement = document.getElementById('versionNumber');
+    
+    if (versionElement) {
+      const manifestData = browser.runtime.getManifest();
+      versionElement.textContent = manifestData.version;
+      logDebug('Version element found and updated:', manifestData.version);
+    }
+    else {
+      logDebug('Version element not found');
+    }
   }
   
 }
