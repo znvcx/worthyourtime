@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Worth Your Time?",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Convert prices into equivalent work time",
   "browser_specific_settings": {
     "gecko": {
